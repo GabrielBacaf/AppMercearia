@@ -33,7 +33,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $permissionEnums = [
             UserPermissionEnum::class,
             SalesPermissionEnum::class,
-            
+
         ];
 
         foreach ($permissionEnums as $enumClass) {
@@ -55,7 +55,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'guard_name' => $this->defaultGuard,
         ]);
 
-        $role->givePermissionTo(Permission::all());
+        $permissions = Permission::where('guard_name', $this->defaultGuard)->get();
+        $role->syncPermissions($permissions);
     }
 
 }

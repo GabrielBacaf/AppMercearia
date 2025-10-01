@@ -27,7 +27,7 @@ class User extends Authenticatable
 
     protected $guard_name = 'api';
 
-    protected $hidden = ['password', 'remember_token'];
+   
 
     /**
      * The attributes that should be hidden for serialization.

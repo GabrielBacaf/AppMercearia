@@ -9,7 +9,7 @@ use App\Http\Requests\AuthRequest;
 
 class AuthController extends Controller
 {
-     public function __construct(protected AuthService $authService)
+    public function __construct(protected AuthService $authService)
     {
     }
     /**
@@ -17,8 +17,8 @@ class AuthController extends Controller
      */
     public function login(AuthRequest $request)
     {
-        $this->authService->login($request->validated());
-
+        $token = $this->authService->login($request->validated());
+        return $token;
     }
 
     /**
