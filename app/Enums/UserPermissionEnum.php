@@ -8,6 +8,8 @@ enum UserPermissionEnum:string
     case READ = 'read users';
     case UPDATE = 'update users';
     case DELETE = 'delete users';
+    case SHOW = 'show users';
+    case LIST = 'list users';
 
     public static function values(): array
     {
