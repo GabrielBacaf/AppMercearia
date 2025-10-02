@@ -2,73 +2,67 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\UserPermissionEnum;
+
 use App\Http\Services\UserService;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
 
     public function __construct(protected UserService $userService)
     {
+        $this->authorizeResource(User::class, 'user');
+    }
+
+    public function index(): JsonResponse
+    {
+        $users = User::paginate(15);
+        return response()->json($users);
     }
 
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function store(StoreUserRequest $request): JsonResponse
     {
-        //
-    }
+        $validatedData = $request->validated();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $user = User::create($validatedData);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $this->authorize(UserPermissionEnum::CREATE->value);
-
-
+        return response()->json([
+            'data'    => $user,
+            'message' => 'Usuário criado com sucesso!',
+        ], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $user): JsonResponse
     {
-        //
+        return response()->json($user);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
-        //
+        $validatedData = $request->validated();
+
+        if (isset($validatedData['password'])) {
+            $validatedData['password'] = Hash::make($validatedData['password']);
+        }
+
+        $user->update($validatedData);
+
+        return response()->json($user);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(User $user): JsonResponse
     {
-        //
+        $user->delete();
+        return response()->json(null, 204);
     }
 }
