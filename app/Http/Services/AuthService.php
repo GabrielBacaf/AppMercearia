@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+
 use App\Enums\UserPermissionEnum;
 use App\Http\Requests\AuthRequest;
 use App\Models\User;
@@ -24,7 +25,6 @@ class AuthService
 
             throw new AuthenticationException('Dados incorretos! Tente novamente.');
         }
-        
         return $this->user->createToken($credentials['device_name'], [UserPermissionEnum::CREATE->value])->plainTextToken;
     }
 }
