@@ -25,6 +25,7 @@ class AuthRequest extends FormRequest
         return [
             'login' => ['required', 'string', 'max:50'],
             'password' => ['required', 'string', 'min:4', 'max:12'],
+            'device_name' => 'required|string',
         ];
     }
 

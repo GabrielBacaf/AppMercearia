@@ -4,68 +4,41 @@ namespace App\Http\Controllers;
 
 use App\Http\Services\AuthService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 use App\Http\Requests\AuthRequest;
 
 class AuthController extends Controller
 {
-    public function __construct(protected AuthService $authService)
+    public function __construct(protected AuthService $authService) {}
+
+
+    public function login(AuthRequest $request): JsonResponse
     {
-    }
-    /**
-     * Display a listing of the resource.
-     */
-    public function login(AuthRequest $request)
-    {
-        $token = $this->authService->login($request->validated());
-        return $token;
+        try {
+            $token = $this->authService->login($request->validated());
+        } catch (AuthenticationException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        return response()->json([
+            'message' => 'Login bem-sucedido!',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ], Response::HTTP_OK);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function logout(Request $request): JsonResponse
     {
-        //
-    }
+        $request->user()?->currentAccessToken()->delete();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'message' => 'Logout realizado com sucesso!'
+        ], Response::HTTP_OK);
     }
 }
