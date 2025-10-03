@@ -22,7 +22,7 @@ class AuthController extends Controller
             $token = $this->authService->login($request->validated());
         } catch (AuthenticationException $e) {
             return response()->json([
-                'message' => $e->getMessage(),
+                'message' => 'Credenciais inválidas.'
             ], Response::HTTP_UNAUTHORIZED);
         }
 
