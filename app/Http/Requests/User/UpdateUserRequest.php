@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\User;
 
 use App\Enums\UserPermissionEnum;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class UpdateUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('update', User::class);
+        return $this->user()->can(UserPermissionEnum::UPDATE->value);
     }
 
     /**
@@ -28,10 +29,10 @@ class UpdateUserRequest extends FormRequest
         $userId = $this->route('user')->id;
 
         return [
-            'name' => ['sometimes', 'string', 'max:100'],
-            'login' => ['sometimes', 'string', 'max:50', Rule::unique('users')->ignore($userId)],
-            'email' => ['sometimes', 'email', 'max:100', 'nullable', Rule::unique('users')->ignore($userId)],
-            'password' => ['sometimes', 'string', 'min:4', 'max:12', 'confirmed'],
+            'name' => ['required', 'string', 'max:100'],
+            'login' => ['required', 'string', 'max:50', Rule::unique('users', 'login')->ignore($userId)],
+            'email' => ['nullable', 'email', 'max:100', Rule::unique('users', 'email')->ignore($userId)],
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
             'status' => ['sometimes', 'boolean'],
         ];
     }
