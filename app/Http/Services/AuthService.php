@@ -2,14 +2,9 @@
 
 namespace App\Http\Services;
 
-
-use App\Enums\UserPermissionEnum;
-use App\Http\Requests\AuthRequest;
 use App\Models\User;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-
 
 class AuthService
 {
