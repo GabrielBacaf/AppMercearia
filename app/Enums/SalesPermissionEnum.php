@@ -7,7 +7,7 @@ enum SalesPermissionEnum: string
     case CREATE = 'create sales';
     case READ = 'read sales';
     case UPDATE = 'update sales';
-    case DELETE = 'delete sales';
+    case DESTROY = 'destroy sales';
 
     /**
      * Retorna todas as permissões em array de strings

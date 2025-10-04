@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Api\V1\Controller;;
+use App\Http\Requests\Api\V1\Auth\AuthRequest;
 use App\Http\Services\AuthService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-
-use App\Http\Requests\AuthRequest;
 
 class AuthController extends Controller
 {
@@ -22,7 +21,7 @@ class AuthController extends Controller
             $token = $this->authService->login($request->validated());
         } catch (AuthenticationException $e) {
             return response()->json([
-                'message' => $e->getMessage(),
+                'message' => 'Credenciais inválidas.'
             ], Response::HTTP_UNAUTHORIZED);
         }
 
