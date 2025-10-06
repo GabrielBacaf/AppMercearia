@@ -15,7 +15,7 @@ class StoreUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can(UserPermissionEnum::CREATE->value);
+        return true;
     }
 
     /**

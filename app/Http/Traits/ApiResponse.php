@@ -2,9 +2,13 @@
 
 namespace App\Http\Traits;
 
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response; // Importar a classe Response
-use Illuminate\Validation\Validator; // Importar o Validator
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Response;
+use Illuminate\Validation\Validator;
 
 trait ApiResponse
 {
@@ -16,7 +20,7 @@ trait ApiResponse
      * @param int $status
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function successResponse(mixed $data = [], string $message = '', int $status = Response::HTTP_OK): JsonResponse
+    protected function successResponse(array|Model|JsonResource $data = []  , string $message = '', int $status): JsonResponse
     {
         return response()->json([
             'success' => true,
@@ -33,7 +37,7 @@ trait ApiResponse
      * @param int $status
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function errorResponse(string $message, array $errors = [], int $status = Response::HTTP_BAD_REQUEST): JsonResponse
+    protected function errorResponse(string $message, array $errors = [], int $status): JsonResponse
     {
         return response()->json([
             'success' => false,

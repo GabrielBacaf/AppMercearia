@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
                 'email' => 'admin@teste.com',
             ]);
 
-            $user->assignRole('admin');
+            $user->createToken('admin')->plainTextToken;
         }
     }
 }

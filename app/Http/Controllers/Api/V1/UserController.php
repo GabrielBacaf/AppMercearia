@@ -10,8 +10,10 @@ use App\Http\Services\UserService;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
+use function Laravel\Prompts\error;
 
 class UserController extends Controller
 {
@@ -20,16 +22,31 @@ class UserController extends Controller
 
     public function index(): JsonResponse
     {
-        $this->authorize(UserPermissionEnum::INDEX->value);
+        // if (!Auth::user()->tokenCant(UserPermissionEnum::INDEX->value)) {
+        //     return $this->errorResponse(message: 'Usuário não Autorizado!', errors: [], status: 403);
+        // }
+
+        $this->authorize('viewAny', User::class);
 
         $users = User::paginate(5);
-        return $this->successResponse(UserResource::collection($users), 'Lista de usuários ');
+
+        return $this->successResponse(
+            new UserResource($users),
+            'Lista de usuários',
+            200
+        );
     }
 
 
     public function store(StoreUserRequest $request): JsonResponse
     {
-        $this->authorize(UserPermissionEnum::CREATE->value);
+        // if (!Auth::user()->tokenCant(UserPermissionEnum::CREATE->value)) {
+        //     return $this->errorResponse(message: 'Usuário não Autorizado!', errors: [], status: 403);
+        // }
+
+        // dd(Auth::check(), Auth::user());
+
+        $this->authorize('create', User::class);
 
         $validatedData = $request->validated();
 
@@ -43,14 +60,17 @@ class UserController extends Controller
      */
     public function show(User $user): JsonResponse
     {
-        $this->authorize(UserPermissionEnum::SHOW->value);
-        return response()->json($user);
+        if (!Auth::user()->tokenCant(UserPermissionEnum::SHOW->value)) {
+            return $this->errorResponse(message: 'Usuário não Autorizado!', errors: [], status: 403);
+        }
+        return $this->successResponse(UserResource::array($user), 'Detalhes do usuario', 200);
     }
 
     public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
-
-
+        if (!Auth::user()->tokenCant(UserPermissionEnum::UPDATE->value)) {
+            return $this->errorResponse(message: 'Usuário não Autorizado!', errors: [], status: 403);
+        }
         $validatedData = $request->validated();
 
         if (isset($validatedData['password'])) {
@@ -58,19 +78,16 @@ class UserController extends Controller
         }
         $user->update($validatedData);
 
-        return response()->json([
-            'data' => $user,
-            'message' => 'Usuário atualizado com sucesso!',
-        ]);
+        return $this->successResponse(new UserResource($user), 'User atualizado com sucesso!', 200);
     }
 
 
     public function destroy(User $user): JsonResponse
     {
+        if (Auth::user()->tokenCant(UserPermissionEnum::DESTROY->value)) {
+            return $this->errorResponse(message: 'Usuário não Autorizado!', errors: [], status: 403);
+        }
         $user->delete();
-
-        return response()->json([
-            'message' => 'Usuário deletado com sucesso!',
-        ], 204);
+        return $this->successResponse(message: 'Usuário Deletado com sucesso!', status: 204);
     }
 }
