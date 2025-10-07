@@ -17,8 +17,7 @@ class AuthControllerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create([
-        ]);
+        $this->user = User::factory()->create();
     }
 
     # php artisan test --filter=AuthControllerTest::test_logando_com_sucesso
@@ -57,6 +56,7 @@ class AuthControllerTest extends TestCase
 
         //Arrange
         $token = $this->user->createToken('testing')->plainTextToken;
+        
 
         //Act
         $response = $this->withHeader('Authorization', "Bearer $token")
