@@ -19,7 +19,7 @@ class UserController extends Controller
 
         $this->authorize(UserPermissionEnum::INDEX->value);
         $users = User::paginate(5);
-        return $this->successResponse(UserResource::collection($users), 'Lista de usuários', 200);
+        return $this->successResponse(UserResource::collection($users), 'Usuário listados com sucesso!', 200);
     }
 
     public function store(StoreUserRequest $request): JsonResponse
@@ -35,7 +35,7 @@ class UserController extends Controller
     {
         $this->authorize(UserPermissionEnum::SHOW->value);
 
-        return $this->successResponse(new UserResource($user), 'Detalhes do usuário', 200);
+        return $this->successResponse(new UserResource($user), 'Usuário detalhado com sucesso!', 200);
     }
 
     public function update(UpdateUserRequest $request, User $user): JsonResponse

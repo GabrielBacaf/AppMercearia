@@ -6,6 +6,7 @@ use App\Enums\UserPermissionEnum;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 
 class StoreUserRequest extends FormRequest
@@ -27,8 +28,8 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:100'],
-            'login' => ['required', 'string', 'max:50', 'unique:users,login'],
-            'email' => ['sometimes', 'email', 'max:100', 'unique:users,email'],
+            'login' => ['required', 'string', 'max:50', Rule::unique('users', 'login')],
+            'email' => ['sometimes', 'email', 'max:100', Rule::unique('users', 'email')],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
             'status' => ['sometimes', 'boolean'],
 
