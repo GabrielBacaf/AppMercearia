@@ -2,6 +2,7 @@
 
 namespace App\Http\Traits;
 
+use DragonCode\Support\Callbacks\Empties;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -20,7 +21,7 @@ trait ApiResponse
      * @param int $status
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function successResponse(array|Model|JsonResource $data = []  , string $message = '', int $status): JsonResponse
+    protected function successResponse(array|Model|JsonResource|null $data = []  , string $message = '', int $status = 200): JsonResponse
     {
         return response()->json([
             'success' => true,
