@@ -2,13 +2,10 @@
 
 namespace App\Http\Traits;
 
-use DragonCode\Support\Callbacks\Empties;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\Validator;
 
 trait ApiResponse
@@ -21,7 +18,7 @@ trait ApiResponse
      * @param int $status
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function successResponse(array|Model|JsonResource|null $data = []  , string $message = '', int $status = 200): JsonResponse
+    protected function successResponse(array|Model|JsonResource|null $data = []  , string $message = '', int $status =200): JsonResponse
     {
         return response()->json([
             'success' => true,
@@ -45,20 +42,5 @@ trait ApiResponse
             'message' => $message,
             'errors'  => $errors
         ], $status);
-    }
-
-    /**
-     * Retorna uma resposta para erros de validação.
-     *
-     * @param \Illuminate\Validation\Validator $validator
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function responseValidationError(Validator $validator): JsonResponse
-    {
-        return $this->errorResponse(
-            'Dados inválidos.',
-            $validator->errors()->toArray(),
-            Response::HTTP_UNPROCESSABLE_ENTITY
-        );
     }
 }
