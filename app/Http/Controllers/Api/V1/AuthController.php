@@ -30,7 +30,7 @@ class AuthController extends Controller
                 200,
             );
         }
-        return $this->errorResponse('Not Authorized', [], 403);
+        return $this->errorResponse('Not Authorized', [], 401);
     }
 
     public function logout(Request $request): JsonResponse
