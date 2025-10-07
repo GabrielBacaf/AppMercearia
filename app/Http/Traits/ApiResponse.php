@@ -2,9 +2,11 @@
 
 namespace App\Http\Traits;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response; // Importar a classe Response
-use Illuminate\Validation\Validator; // Importar o Validator
+use Illuminate\Http\Resources\Json\JsonResource;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Validation\Validator;
 
 trait ApiResponse
 {
@@ -16,7 +18,7 @@ trait ApiResponse
      * @param int $status
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function successResponse(mixed $data = [], string $message = '', int $status = Response::HTTP_OK): JsonResponse
+    protected function successResponse(array|Model|JsonResource|null $data = []  , string $message = '', int $status =200): JsonResponse
     {
         return response()->json([
             'success' => true,
@@ -33,27 +35,12 @@ trait ApiResponse
      * @param int $status
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function errorResponse(string $message, array $errors = [], int $status = Response::HTTP_BAD_REQUEST): JsonResponse
+    protected function errorResponse(string $message, array $errors = [], int $status): JsonResponse
     {
         return response()->json([
             'success' => false,
             'message' => $message,
             'errors'  => $errors
         ], $status);
-    }
-
-    /**
-     * Retorna uma resposta para erros de validação.
-     *
-     * @param \Illuminate\Validation\Validator $validator
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function responseValidationError(Validator $validator): JsonResponse
-    {
-        return $this->errorResponse(
-            'Dados inválidos.',
-            $validator->errors()->toArray(),
-            Response::HTTP_UNPROCESSABLE_ENTITY
-        );
     }
 }

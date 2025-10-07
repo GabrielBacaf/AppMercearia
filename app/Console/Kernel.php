@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // Limpa os tokens expirados do Sanctum diariamente.
-        $schedule->command('sanctum:prune-expired')->daily();
+        $schedule->command('sanctum:prune-expired')->everyTwoMinutes();
     }
 
     /**
@@ -22,7 +22,6 @@ class Kernel extends ConsoleKernel
     protected function commands(): void
     {
         $this->load(__DIR__ . '/Commands');
-
         require base_path('routes/console.php');
     }
 }

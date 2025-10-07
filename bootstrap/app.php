@@ -1,25 +1,24 @@
 <?php
 
-
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use App\Console\Kernel as ConsoleKernel;
 
-return Application::configure(basePath: dirname(__DIR__))
+// Cria a aplicação
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         api: __DIR__ . '/../routes/api.php',
-        apiPrefix: 'api',
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
-
     )
-    ->withMiddleware(function (Middleware $middleware): void {
+    ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -38,3 +37,11 @@ return Application::configure(basePath: dirname(__DIR__))
             ], $e->getStatusCode());
         });
     })->create();
+
+// Registra o Kernel do Console
+$app->singleton(
+    ConsoleKernelContract::class,
+    ConsoleKernel::class
+);
+
+return $app;

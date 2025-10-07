@@ -4,10 +4,10 @@ namespace App\Enums;
 
 enum SalesPermissionEnum: string
 {
-    case CREATE = 'create sales';
-    case READ = 'read sales';
-    case UPDATE = 'update sales';
-    case DESTROY = 'destroy sales';
+    case CREATE = 'create sale';
+    case READ = 'read sale';
+    case UPDATE = 'update sale';
+    case DESTROY = 'destroy sale';
 
     /**
      * Retorna todas as permissões em array de strings
