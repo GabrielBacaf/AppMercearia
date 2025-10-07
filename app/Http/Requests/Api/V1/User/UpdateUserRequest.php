@@ -6,6 +6,8 @@ use App\Enums\UserPermissionEnum;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -35,5 +37,13 @@ class UpdateUserRequest extends FormRequest
             'password' => ['sometimes', 'string', 'min:6', 'confirmed'],
             'status' => ['sometimes', 'boolean'],
         ];
+    }
+        protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'Erro de validação',
+            'errors'  => $validator->errors()
+        ], 422));
     }
 }
