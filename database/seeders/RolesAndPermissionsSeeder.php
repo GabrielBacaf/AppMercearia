@@ -25,6 +25,22 @@ class RolesAndPermissionsSeeder extends Seeder
         $this->createAdminRole();
     }
 
+    private function getAllEnumPermissions(): array
+    {
+        $permissionEnums = [
+            UserPermissionEnum::class,
+            RolePermissionEnum::class,
+            PermissionEnum::class,
+        ];
+
+        $allPermissions = [];
+        foreach ($permissionEnums as $enumClass) {
+            $allPermissions = array_merge($allPermissions, $enumClass::values());
+        }
+
+        return $allPermissions;
+    }
+
     private function clearCachedPermissions(): void
     {
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
@@ -32,21 +48,27 @@ class RolesAndPermissionsSeeder extends Seeder
 
     private function createPermissions(): void
     {
-        $permissionEnums = [
-            UserPermissionEnum::class,
-            SalesPermissionEnum::class,
-            RolePermissionEnum::class,
-            PermissionEnum::class,
 
-        ];
+        $allEnumPermissions = $this->getAllEnumPermissions();
+        $this->deleteObsoletePermissions($allEnumPermissions);
+        $this->createOrUpdatePermissions($allEnumPermissions);
+    }
 
-        foreach ($permissionEnums as $enumClass) {
-            foreach ($enumClass::values() as $permission) {
-                Permission::firstOrCreate([
-                    'name' => $permission,
-                    'guard_name' => $this->defaultGuard,
-                ]);
-            }
+    private function deleteObsoletePermissions(array $validPermissions): void
+    {
+        $this->command->info('Limpando permissões obsoletas...');
+        Permission::whereNotIn('name', $validPermissions)
+            ->where('guard_name', $this->defaultGuard)
+            ->delete();
+    }
+    private function createOrUpdatePermissions(array $validPermissions): void
+    {
+        $this->command->info('Criando ou atualizando permissões...');
+        foreach ($validPermissions as $permission) {
+            Permission::firstOrCreate([
+                'name' => $permission,
+                'guard_name' => $this->defaultGuard,
+            ]);
         }
     }
 

@@ -15,6 +15,6 @@ Route::prefix('v1')->group(function () {
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
         Route::apiResource('users', UserController::class);
         Route::apiResource('roles', RoleController::class);
-        Route::get('permission',[PermissionController::class, 'index'])->name('permission.index');
+        Route::get('permissions',[PermissionController::class, 'index'])->name('permissions.index');
     });
 });
