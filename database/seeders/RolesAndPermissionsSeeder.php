@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\PermissionEnum;
+use App\Enums\RolePermissionEnum;
 use App\Enums\SalesPermissionEnum;
 use App\Enums\UserPermissionEnum;
 use Spatie\Permission\Models\Role;
@@ -33,6 +35,8 @@ class RolesAndPermissionsSeeder extends Seeder
         $permissionEnums = [
             UserPermissionEnum::class,
             SalesPermissionEnum::class,
+            RolePermissionEnum::class,
+            PermissionEnum::class,
 
         ];
 
