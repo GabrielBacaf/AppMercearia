@@ -31,6 +31,8 @@ class StoreUserRequest extends FormRequest
             'login' => ['required', 'string', 'max:50', Rule::unique('users', 'login')],
             'email' => ['sometimes', 'email', 'max:100', Rule::unique('users', 'email')],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
+            'roles' => ['required', 'array', 'min:1'],
+            'roles.*' => [Rule::exists('roles', 'name')],
             'status' => ['sometimes', 'boolean'],
 
         ];
@@ -40,6 +42,7 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => 'Nome',
             'login' => 'Login',
+            'roles' => 'PERFIS',
             'email' => 'E-mail',
             'password' => 'Senha',
             'status' => 'Status',
@@ -50,7 +53,7 @@ class StoreUserRequest extends FormRequest
         throw new HttpResponseException(response()->json([
             'success' => false,
             'message' => 'Erro de validação',
-            'errors'  => $validator->errors()
+            'errors' => $validator->errors()
         ], 422));
     }
 }
