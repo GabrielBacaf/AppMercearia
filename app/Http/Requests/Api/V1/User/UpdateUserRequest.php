@@ -35,15 +35,29 @@ class UpdateUserRequest extends FormRequest
             'login' => ['sometimes', 'string', 'max:50', Rule::unique('users', 'login')->ignore($userId)],
             'email' => ['nullable', 'email', 'max:100', Rule::unique('users', 'email')->ignore($userId)],
             'password' => ['sometimes', 'string', 'min:6', 'confirmed'],
+            'roles' => ['required', 'array', 'min:1'],
+            'roles.*' => [Rule::exists('roles', 'name')],
             'status' => ['sometimes', 'boolean'],
         ];
     }
-        protected function failedValidation(Validator $validator)
+
+    public function attributes(): array
+    {
+        return [
+            'name' => 'Nome',
+            'login' => 'Login',
+            'roles' => 'PERFIS',
+            'email' => 'E-mail',
+            'password' => 'Senha',
+            'status' => 'Status',
+        ];
+    }
+    protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
             'success' => false,
             'message' => 'Erro de validação',
-            'errors'  => $validator->errors()
+            'errors' => $validator->errors()
         ], 422));
     }
 }

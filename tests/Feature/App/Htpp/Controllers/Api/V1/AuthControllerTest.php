@@ -56,7 +56,7 @@ class AuthControllerTest extends TestCase
 
         //Arrange
         $token = $this->user->createToken('testing')->plainTextToken;
-        
+
 
         //Act
         $response = $this->withHeader('Authorization', "Bearer $token")

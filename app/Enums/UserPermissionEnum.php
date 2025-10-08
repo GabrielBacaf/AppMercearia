@@ -4,8 +4,7 @@ namespace App\Enums;
 
 enum UserPermissionEnum:string
 {
-    case CREATE = 'create user';
-    case READ = 'read user';
+    case STORE = 'store user';
     case UPDATE = 'update user';
     case DESTROY = 'destroy user';
     case SHOW = 'show user';

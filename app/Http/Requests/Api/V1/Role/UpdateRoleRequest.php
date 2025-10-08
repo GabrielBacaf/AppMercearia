@@ -1,22 +1,21 @@
 <?php
 
-namespace App\Http\Requests\Api\V1\User;
-
-use App\Enums\UserPermissionEnum;
+namespace App\Http\Requests\Api\V1\Role;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Enums\RolePermissionEnum;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\Rule;
 
-class StoreUserRequest extends FormRequest
+class UpdateRoleRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can(RolePermissionEnum::UPDATE->value);
     }
 
     /**
@@ -26,28 +25,24 @@ class StoreUserRequest extends FormRequest
      */
     public function rules(): array
     {
+         $role = $this->route('role');
+
         return [
-            'name' => ['required', 'string', 'max:100'],
-            'login' => ['required', 'string', 'max:50', Rule::unique('users', 'login')],
-            'email' => ['sometimes', 'email', 'max:100', Rule::unique('users', 'email')],
-            'password' => ['required', 'string', 'min:6', 'confirmed'],
-            'roles' => ['required', 'array', 'min:1'],
-            'roles.*' => [Rule::exists('roles', 'name')],
-            'status' => ['sometimes', 'boolean'],
+            'name' => ['required', 'string', 'max:50', 'min:3', Rule::unique('roles', 'name')->ignore($role->id),],
+            'permissions' => ['required', 'array', 'min:1'],
+            'permissions.*' => ['integer', 'exists:permissions,id'],
 
         ];
     }
+
     public function attributes(): array
     {
         return [
-            'name' => 'Nome',
-            'login' => 'Login',
-            'roles' => 'PERFIS',
-            'email' => 'E-mail',
-            'password' => 'Senha',
-            'status' => 'Status',
+            'name' => 'Nome do perfil',
+            'permissions' => 'Permissões',
         ];
     }
+
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
