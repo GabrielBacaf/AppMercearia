@@ -4,8 +4,7 @@ namespace App\Enums;
 
 enum RolePermissionEnum: string
 {
-    case CREATE = 'create role';
-    case READ = 'read role';
+    case STORE = 'store role';
     case UPDATE = 'update role';
     case DESTROY = 'destroy role';
     case SHOW = 'show role';
