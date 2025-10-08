@@ -2,21 +2,16 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Enums\UserPermissionEnum;
 use App\Http\Controllers\Api\V1\Controller;;
-
 use App\Http\Requests\Api\V1\Auth\AuthRequest;
-use App\Http\Resources\V1\User\UserResource;
-use App\Http\Services\AuthService;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpFoundation\Response;
+
 
 class AuthController extends Controller
 {
-    public function __construct(protected AuthService $authService) {}
+    public function __construct() {}
 
     public function login(AuthRequest $request): JsonResponse
     {

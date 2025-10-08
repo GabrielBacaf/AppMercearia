@@ -5,7 +5,6 @@ namespace App\Enums;
 enum SalesPermissionEnum: string
 {
     case CREATE = 'create sale';
-    case READ = 'read sale';
     case UPDATE = 'update sale';
     case DESTROY = 'destroy sale';
 
