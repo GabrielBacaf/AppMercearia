@@ -6,18 +6,22 @@ use App\Enums\RolePermissionEnum;
 
 use App\Http\Controllers\Api\V1\Controller;
 use App\Http\Requests\Api\V1\Role\StoreRoleRequest;
-use App\Http\Resources\Role\RoleResource;
+use App\Http\Requests\Api\V1\Role\UpdateRoleRequest;
+use App\Http\Requests\Api\V1\User\UpdateUserRequest;
+use App\Http\Resources\V1\Role\RoleResource;
 use App\Http\Services\RoleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Spatie\Permission\Contracts\Permission;
+use LaravelLang\Publisher\Console\Update;
 use Spatie\Permission\Models\Role;
 use Throwable;
 
 class RoleController extends Controller
 {
 
-    public function __construct(protected RoleService $roleService) {}
+    public function __construct(protected RoleService $roleService)
+    {
+    }
 
     public function index()
     {
@@ -28,7 +32,7 @@ class RoleController extends Controller
 
     public function store(StoreRoleRequest $request)
     {
-        $this->authorize(RolePermissionEnum::CREATE->value);
+        $this->authorize(RolePermissionEnum::STORE->value);
         try {
             $role = $this->roleService->storeRole($request->validated());
             return $this->successResponse(
@@ -38,14 +42,29 @@ class RoleController extends Controller
             );
         } catch (Throwable $e) {
             Log::error('Erro ao criar perfil', ['exception' => $e]);
-            return $this->errorResponse( $e->getMessage(), [] , 500);
+            return $this->errorResponse($e->getMessage(), [], 500);
         }
     }
 
 
-    public function update(Request $request, string $id)
+    public function update(UpdateRoleRequest $request, Role $role)
     {
-        //
+        $this->authorize(RolePermissionEnum::UPDATE->value);
+
+        try {
+
+            $updatedRole = $this->roleService->updateRole($role, $request->validated());
+
+            return $this->successResponse(
+                new RoleResource($updatedRole),
+                'Perfil atualizado com sucesso!',
+                200
+            );
+        } catch (Throwable $e) {
+
+            Log::error('Erro ao ATUALIZAR perfil', ['exception' => $e]);
+            return $this->errorResponse($e->getMessage(), [], 500);
+        }
     }
 
     /**

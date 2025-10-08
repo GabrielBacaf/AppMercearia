@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\PermissionEnum;
-use App\Http\Resources\Permission\PermissionResource;
+use App\Http\Resources\V1\Permission\PermissionResource;
 use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller

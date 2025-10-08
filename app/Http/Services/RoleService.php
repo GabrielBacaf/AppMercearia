@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use Throwable;
 
 class RoleService
 {
@@ -16,8 +17,9 @@ class RoleService
     public function storeRole(array $data): Role
     {
         return DB::transaction(function () use ($data) {
-            $role = Role::create([
+            $role = Role::firstOrCreate([
                 'name' => $data['name'],
+                'guard_name' => 'api',
             ]);
 
             $role->syncPermissions($data['permissions']);
@@ -32,7 +34,7 @@ class RoleService
      *
      * @throws Throwable
      */
-    public function update(Role $role, array $data): Role
+    public function updateRole(Role $role, array $data): Role
     {
         return DB::transaction(function () use ($role, $data) {
             $role->update([
