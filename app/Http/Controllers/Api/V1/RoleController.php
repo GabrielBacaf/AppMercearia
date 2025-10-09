@@ -19,14 +19,12 @@ use Throwable;
 class RoleController extends Controller
 {
 
-    public function __construct(protected RoleService $roleService)
-    {
-    }
+    public function __construct(protected RoleService $roleService) {}
 
     public function index()
     {
         $this->authorize(RolePermissionEnum::INDEX->value);
-        $roles = Role::all();
+        $roles = Role::paginate(5);
         return $this->successResponse(RoleResource::collection($roles), "Perfis listados com sucesso!", 200);
     }
 
@@ -42,10 +40,9 @@ class RoleController extends Controller
             );
         } catch (Throwable $e) {
             Log::error('Erro ao criar perfil', ['exception' => $e]);
-            return $this->errorResponse($e->getMessage(), [], 500);
+            return $this->errorResponse('Erro ao criar perfil', [], 500);
         }
     }
-
 
     public function update(UpdateRoleRequest $request, Role $role)
     {
@@ -63,7 +60,7 @@ class RoleController extends Controller
         } catch (Throwable $e) {
 
             Log::error('Erro ao ATUALIZAR perfil', ['exception' => $e]);
-            return $this->errorResponse($e->getMessage(), [], 500);
+            return $this->errorResponse('Erro ao ATUALIZAR perfil', [], 500);
         }
     }
 
