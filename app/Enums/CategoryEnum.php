@@ -6,7 +6,7 @@ enum CategoryEnum: string
 
 {
     // Groceries & Pantry Staples
-    case GROCERIES = 'Mercearia';
+    case BASICPRODUCT = 'Produtos Básicos';
     case GRAINS_AND_CEREALS = 'Grãos e Cereais';
     case PASTA_AND_SAUCES = 'Massas e Molhos';
     case OILS_AND_FATS = 'Óleos e Gorduras';
@@ -43,7 +43,7 @@ enum CategoryEnum: string
     case BEVERAGES = 'Bebidas';
     case WATER_AND_JUICES = 'Águas e Sucos';
     case SODAS = 'Refrigerantes';
-   
+
 
         // Personal Hygiene
     case PERSONAL_HYGIENE = 'Higiene Pessoal';
@@ -58,6 +58,8 @@ enum CategoryEnum: string
         // Special Categories
     case PET_SUPPLIES = 'Pet Shop';
     case HOUSEHOLD_UTILITIES = 'Utilidades Domésticas';
+
+    case GALAOAGUA = 'Galão de Agua 20L';
     case OTHERS = 'Outros';
 
 

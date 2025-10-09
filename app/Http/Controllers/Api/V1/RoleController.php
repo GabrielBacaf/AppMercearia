@@ -19,13 +19,20 @@ use Throwable;
 class RoleController extends Controller
 {
 
-    public function __construct(protected RoleService $roleService) {}
+    public function __construct(protected RoleService $roleService)
+    {
+    }
 
     public function index()
     {
         $this->authorize(RolePermissionEnum::INDEX->value);
         $roles = Role::paginate(5);
-        return $this->successResponse(RoleResource::collection($roles), "Perfis listados com sucesso!", 200);
+        return $this->successResponseCollection(
+            RoleResource::collection($roles),
+            $roles,
+            "Perfis listados com sucesso!",
+            200
+        );
     }
 
     public function store(StoreRoleRequest $request)

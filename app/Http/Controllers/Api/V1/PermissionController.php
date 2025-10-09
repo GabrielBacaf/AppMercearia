@@ -19,24 +19,28 @@ class PermissionController extends Controller
 
         $permissions = Permission::paginate(5);
 
-        return $this->successResponse(PermissionResource::collection($permissions), "Permissões listados com sucesso!", 200);
+        return $this->successResponseCollection(
+            PermissionResource::collection($permissions),
+            $permissions,
+            "Permissões listados com sucesso!",
+            200
+        );
     }
 
     public function store(StoreProductRequest $request)
     {
         $this->authorize(ProductPermissionEnum::STORE->value);
 
-        $validateData = $request->validate();
+        $validateData = $request->validated();
 
-        $produto =  Product::created($validateData);
+        $produto = Product::create($validateData);
 
         return $this->successResponse($produto, 'Produto cadastrado com sucesso!', 201);
     }
 
-    public function update(UpdateProductRequest $request, Product $product){
+    public function update(UpdateProductRequest $request, Product $product)
+    {
         $this->authorize(ProductPermissionEnum::UPDATE->value);
-
-
 
     }
 }

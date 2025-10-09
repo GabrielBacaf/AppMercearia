@@ -21,7 +21,7 @@ class StoreProductRequest extends FormRequest
         return [
             'barcode'         => ['required', 'string', 'max:14', Rule::unique('products', 'barcode')],
             'name'            => ['required', 'string', 'max:255', Rule::unique('products', 'name')],
-            'expiration_date' => ['sometimes', 'nullable', 'date', 'date_format:Y-m-d', 'after_or_equal:today'],
+            'expiration_date' => ['sometimes', 'date', 'after_or_equal:today'],
             'sale_value'      => ['required', 'numeric', 'min:0'],
             'category'        => ['required', 'string', Rule::in(CategoryEnum::values())],
             'stock_quantity'  => ['required', 'integer', 'min:0'],
