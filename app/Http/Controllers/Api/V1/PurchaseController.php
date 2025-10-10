@@ -3,8 +3,14 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\PurchasePermissionEnum;
+use App\Enums\StatusEnum;
+use App\Http\Requests\Api\V1\Purchase\StorePurchaseRequest;
+use App\Http\Requests\Api\V1\Purchase\UpdatePurchaseRequest;
+use App\Http\Resources\V1\Purchase\PurchaseResource;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
+use LaravelLang\Publisher\Console\Update;
+use function PHPUnit\Framework\isNull;
 
 class PurchaseController extends Controller
 {
@@ -17,58 +23,76 @@ class PurchaseController extends Controller
 
         $purchase = Purchase::paginate(5);
         return $this->successResponseCollection(
-            RoleResource::collection($purchase),
-            $roles,
-            "Perfis listados com sucesso!",
+            PurchaseResource::collection($purchase),
+            $purchase,
+            "Compras listados com sucesso!",
             200
         );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(StorePurchaseRequest $request)
     {
-        //
+        $this->authorize(PurchasePermissionEnum::STORE->value);
+
+        $validateData = $request->validated();
+
+        $purchase = Purchase::create(
+            array_merge(
+                $validateData,
+                [
+                    'status' => StatusEnum::PENDENTE
+                ]
+            )
+        );
+
+        return $this->successResponse(
+            new PurchaseResource($purchase),
+            "Compra Registrada com sucesso!",
+            201
+        );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+
+    public function show(Purchase $purchase)
     {
-        //
+        $this->authorize(PurchasePermissionEnum::SHOW->value);
+
+        return $this->successResponse(
+            new PurchaseResource($purchase),
+            'Compra detalhado com sucesso!',
+            200
+        );
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+
+    public function update(UpdatePurchaseRequest $request, Purchase $purchase)
     {
-        //
+        $this->authorize(PurchasePermissionEnum::UPDATE->value);
+
+        $validateData = $request->validated();
+
+        $purchase->update($validateData);
+
+        return $this->successResponse(
+            new PurchaseResource($purchase),
+            "Compra Atualizada com sucesso!",
+            200
+        );
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Purchase $purchase)
     {
-        //
-    }
+        $this->authorize(PurchasePermissionEnum::DESTROY->value);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $validateData = $purchase->products() ?? null;
+
+        if (isNull($validateData)) {
+            $purchase->delete();
+            return $this->successResponse([], 'Compra deletado com sucesso!', 200);
+        }
+
+        return $this->errorResponse('A compra possui vinculo com produtos', [], 500);
+
     }
 }
