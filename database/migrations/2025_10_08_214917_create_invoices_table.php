@@ -10,13 +10,14 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
+            $table->string('access_key', 44)->unique();
             $table->string('label');
             $table->longText('file');
             $table->timestamps();
         });
     }
 
- 
+
     public function down(): void
     {
         Schema::dropIfExists('invoices');
