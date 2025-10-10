@@ -7,11 +7,16 @@ use App\Http\Controllers\Api\V1\Controller;
 use App\Http\Requests\Api\V1\Product\StoreProductRequest;
 use App\Http\Requests\Api\V1\Product\UpdateProductRequest;
 use App\Http\Resources\V1\Product\ProductResource;
+use App\Http\Services\ProductService;
 use App\Models\Product;
+use Exception;
 use Illuminate\Http\JsonResponse;
+use Log;
 
 class ProductController extends Controller
 {
+    public function __construct(protected ProductService $productService){}
+
     public function index(): JsonResponse
     {
         $this->authorize(ProductPermissionEnum::INDEX);
@@ -30,9 +35,7 @@ class ProductController extends Controller
     {
         $this->authorize(ProductPermissionEnum::STORE->value);
 
-        $validateData = $request->validated();
-
-        $product = Product::create($validateData);
+        $product = $this->productService->storeProduct($request->validated());
 
         return $this->successResponse(
             new ProductResource($product),
@@ -47,7 +50,7 @@ class ProductController extends Controller
 
         return $this->successResponse(
             new ProductResource($product),
-            'Usuário detalhado com sucesso!',
+            'Produto detalhado com sucesso!',
             200
         );
     }
@@ -62,8 +65,33 @@ class ProductController extends Controller
 
         return $this->successResponse(
             new ProductResource($product),
-            'Usuário atualizado com sucesso!',
+            'Produto atualizado com sucesso!',
             200
         );
+    }
+
+
+    public function destroy(Product $product)
+    {
+        $this->authorize(ProductPermissionEnum::DESTROY->value);
+
+        try {
+            // Ao excluir o produto, o banco já apaga os registros da tabela 'purchase_item' via CASCADE
+            $product->delete();
+
+            return $this->successResponse(
+                null,
+                'Produto excluído com sucesso!',
+                200
+            );
+        } catch (Exception $e) {
+            Log::error('Erro ao excluir produto', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'product_id' => $product->id,
+            ]);
+
+            return $this->errorResponse('Erro ao excluir produto.', [], 500);
+        }
     }
 }

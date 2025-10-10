@@ -10,21 +10,24 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Rule;
 
 class UpdateProductRequest extends FormRequest
-{ public function authorize(): bool
+{
+    public function authorize(): bool
     {
         return $this->user()?->can(ProductPermissionEnum::UPDATE->value);
     }
 
     public function rules(): array
     {
-         $productId = $this->route('product')->id;
+        $productId = $this->route('product')->id;
         return [
-            'barcode'         => ['required', 'string', 'max:14', Rule::unique('products', 'barcode')->ignore($productId)],
-            'name'            => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($productId)],
+            'barcode' => ['required', 'string', 'max:14', Rule::unique('products', 'barcode')->ignore($productId)],
+            'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($productId)],
             'expiration_date' => ['sometimes', 'nullable', 'date', 'date_format:Y-m-d', 'after_or_equal:today'],
-            'sale_value'      => ['required', 'numeric', 'min:0'],
-            'category'        => ['required', 'string', Rule::in(CategoryEnum::values())],
-            'stock_quantity'  => ['required', 'integer', 'min:0'],
+            'sale_value' => ['required', 'numeric', 'min:0'],
+            'category' => ['required', 'string', Rule::in(CategoryEnum::values())],
+            'stock_quantity' => ['required', 'integer', 'min:0'],
+            'purchase_id' => ['required', 'integer', 'exists:purchases,id'],
+            'purchase_value' => ['required', 'numeric'],
         ];
     }
 
@@ -32,12 +35,14 @@ class UpdateProductRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'barcode'         => 'Código de Barras',
-            'name'            => 'Nome do Produto',
+            'barcode' => 'Código de Barras',
+            'name' => 'Nome do Produto',
             'expiration_date' => 'Data de Validade',
-            'sale_value'      => 'Preço de venda',
-            'category'        => 'Categoria',
-            'stock_quantity'  => 'Quantidade em Estoque',
+            'sale_value' => 'Preço de venda',
+            'category' => 'Categoria',
+            'purchase_value' => 'Valor de Compra',
+            'purchase_id' => 'Compra',
+            'stock_quantity' => 'Quantidade em Estoque',
         ];
     }
 
@@ -46,7 +51,7 @@ class UpdateProductRequest extends FormRequest
         throw new HttpResponseException(response()->json([
             'success' => false,
             'message' => 'Erros de validação foram encontrados.',
-            'errors'  => $validator->errors()
+            'errors' => $validator->errors()
         ], 422));
     }
 }

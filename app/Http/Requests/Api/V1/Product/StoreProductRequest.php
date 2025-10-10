@@ -19,12 +19,14 @@ class StoreProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'barcode'         => ['required', 'string', 'max:14', Rule::unique('products', 'barcode')],
-            'name'            => ['required', 'string', 'max:255', Rule::unique('products', 'name')],
+            'barcode' => ['required', 'string', 'max:14', Rule::unique('products', 'barcode')],
+            'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')],
             'expiration_date' => ['sometimes', 'date', 'after_or_equal:today'],
-            'sale_value'      => ['required', 'numeric', 'min:0'],
-            'category'        => ['required', 'string', Rule::in(CategoryEnum::values())],
-            'stock_quantity'  => ['required', 'integer', 'min:0'],
+            'sale_value' => ['required', 'numeric', 'min:0'],
+            'category' => ['required', 'string', Rule::in(CategoryEnum::values())],
+            'stock_quantity' => ['required', 'integer', 'min:0'],
+            'purchase_id' => ['required', 'integer', 'exists:purchases,id'],
+            'purchase_value' => ['required', 'numeric'],
         ];
     }
 
@@ -32,12 +34,14 @@ class StoreProductRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'barcode'         => 'Código de Barras',
-            'name'            => 'Nome do Produto',
+            'barcode' => 'Código de Barras',
+            'name' => 'Nome do Produto',
             'expiration_date' => 'Data de Validade',
-            'sale_value'      => 'Preço de venda',
-            'category'        => 'Categoria',
-            'stock_quantity'  => 'Quantidade em Estoque',
+            'sale_value' => 'Preço de venda',
+            'category' => 'Categoria',
+            'purchase_value' => 'Valor de Compra',
+            'purchase_id' => 'Compra',
+            'stock_quantity' => 'Quantidade em Estoque',
         ];
     }
 
@@ -46,7 +50,7 @@ class StoreProductRequest extends FormRequest
         throw new HttpResponseException(response()->json([
             'success' => false,
             'message' => 'Erros de validação foram encontrados.',
-            'errors'  => $validator->errors()
+            'errors' => $validator->errors()
         ], 422));
     }
 }
