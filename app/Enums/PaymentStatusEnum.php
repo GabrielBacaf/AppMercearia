@@ -8,7 +8,7 @@ enum PaymentStatusEnum: string
 
     case DEVENDO = 'Devendo';
 
-    case CONSUMO = 'Consumo';
+
 
     public static function values(): array
     {
@@ -16,3 +16,4 @@ enum PaymentStatusEnum: string
     }
 
 }
+ 

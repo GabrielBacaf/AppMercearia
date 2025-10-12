@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum PaymentEnum: string
+enum PaymentTypeEnum: string
 {
     case DINHEIRO = 'Dinheiro';
     case PIXEMPRESA = 'Pix Empresa';
@@ -11,7 +11,7 @@ enum PaymentEnum: string
     case PIXPAI = 'Pix Pai';
     case CREDITO = 'Cartão de Crédito';
     case DEBITO = 'Cartão de Débito';
-    case FIADO = 'FD';
+    case FIADO = 'Fiado';
     case COMSUMO = 'Consumo Pessoal';
 
     public static function values(): array
