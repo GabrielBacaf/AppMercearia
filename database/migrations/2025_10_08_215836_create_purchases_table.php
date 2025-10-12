@@ -14,7 +14,6 @@ return new class extends Migration {
             $table->id();
             $table->string('title', 50);
             $table->string('description')->nullable();
-            $table->decimal('value', 10, 2);
             $table->decimal('count_value')->nullable();
             $table->date('purchase_date');
             $table->string('status');
