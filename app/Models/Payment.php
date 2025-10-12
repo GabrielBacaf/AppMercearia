@@ -9,7 +9,9 @@ class Payment extends Model
 {
     protected $fillable = [
         'value',
-        'type',
+        'payment_status',
+        'payable_id',
+        'payment_type',
         'payable'
     ];
     public function payable(): MorphTo
