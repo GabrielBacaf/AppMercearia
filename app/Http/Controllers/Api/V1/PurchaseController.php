@@ -3,27 +3,28 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\PurchasePermissionEnum;
-use App\Enums\StatusEnum;
 use App\Http\Requests\Api\V1\Purchase\StorePurchaseRequest;
 use App\Http\Requests\Api\V1\Purchase\UpdatePurchaseRequest;
 use App\Http\Resources\V1\Purchase\PurchaseResource;
+use App\Http\Services\PurchaseService;
 use App\Models\Purchase;
-use Illuminate\Http\Request;
-use LaravelLang\Publisher\Console\Update;
+use Exception;
 use function PHPUnit\Framework\isNull;
+
+
 
 class PurchaseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
+    public function __construct(protected PurchaseService $purchaseService) {}
+
     public function index()
     {
         $this->authorize(PurchasePermissionEnum::INDEX->value);
 
         $purchase = Purchase::paginate(5);
         return $this->successResponseCollection(
-            PurchaseResource::collection($purchase),
+            PurchaseResource::collection($purchase->load('payments')),
             $purchase,
             "Compras listados com sucesso!",
             200
@@ -34,31 +35,28 @@ class PurchaseController extends Controller
     {
         $this->authorize(PurchasePermissionEnum::STORE->value);
 
-        $validateData = $request->validated();
+        try {
 
-        $purchase = Purchase::create(
-            array_merge(
-                $validateData,
-                [
-                    'status' => StatusEnum::PENDENTE
-                ]
-            )
-        );
+            $purchase = $this->purchaseService->storePurchase(
+                $request->validated()
+            );
 
-        return $this->successResponse(
-            new PurchaseResource($purchase),
-            "Compra Registrada com sucesso!",
-            201
-        );
+            return $this->successResponse(
+                new PurchaseResource($purchase->load('payments')),
+                "Compra e pagamento inicial registrados com sucesso!",
+                201
+            );
+        } catch (Exception $e) {
+            return $this->errorResponse('Ocorreu um erro ao registrar a compra.', (array)$e->getMessage(), 500);
+        }
     }
-
 
     public function show(Purchase $purchase)
     {
         $this->authorize(PurchasePermissionEnum::SHOW->value);
 
         return $this->successResponse(
-            new PurchaseResource($purchase),
+            new PurchaseResource($purchase->load('payments')),
             'Compra detalhado com sucesso!',
             200
         );
@@ -69,15 +67,21 @@ class PurchaseController extends Controller
     {
         $this->authorize(PurchasePermissionEnum::UPDATE->value);
 
-        $validateData = $request->validated();
+        try {
 
-        $purchase->update($validateData);
+            $purchase = $this->purchaseService->updatePurchase(
+                $request->validated(),
+                $purchase
+            );
 
-        return $this->successResponse(
-            new PurchaseResource($purchase),
-            "Compra Atualizada com sucesso!",
-            200
-        );
+            return $this->successResponse(
+                new PurchaseResource($purchase->load('payments')),
+                "Compra e pagamento inicial atualizados com sucesso!",
+                201
+            );
+        } catch (Exception $e) {
+            return $this->errorResponse('Ocorreu um erro ao atualizar a compra.', (array)$e->getMessage(), 500);
+        }
     }
 
 
@@ -93,6 +97,5 @@ class PurchaseController extends Controller
         }
 
         return $this->errorResponse('A compra possui vinculo com produtos', [], 500);
-
     }
 }
