@@ -2,68 +2,60 @@
 
 namespace App\Http\Services;
 
-use App\Enums\StatusEnum;
 use App\Models\Product;
 use App\Models\Purchase;
-use DB;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Exception;
 
 class ProductService
 {
-    public function __construct()
+    public function __construct() {}
+
+    public function storeProduct(array $data): Product
     {
+        $purchase = Purchase::findOrFail($data['purchase_id']);
+
+        return DB::transaction(function () use ($data, $purchase) {
+
+            $productData = collect($data)->except(['purchase_id', 'purchase_value'])->all();
+
+            $product = Product::create($productData);
+
+
+            $purchase->products()->attach($product->id, [
+                'purchase_value' => $data['purchase_value'],
+                'amount' => $data['stock_quantity'],
+            ]);
+
+
+            $purchase->updateStatus();
+
+            return $product;
+        });
     }
 
-    public function storeProduct($data)
+    public function updateProduct(array $data, Product $product): Product
     {
 
-        try {
-            DB::beginTransaction();
+        return DB::transaction(function () use ($data, $product) {
 
-            $productCreated = Product::create($data->exception('purchase_id', 'purchase_value'));
+            $purchase = Purchase::findOrFail($data['purchase_id']);
 
-            $this->dataPivot($data, $productCreated);
+            $productData = collect($data)->except(['purchase_id', 'purchase_value'])->all();
 
-            $this->dataPurchase($data);
+            $product->update($productData);
 
-            db::commit();
+            $product->purchases()->syncWithoutDetaching([
+                $purchase->id => [
+                    'purchase_value' => $data['purchase_value'],
+                    'amount' => $data['stock_quantity'],
+                ],
+            ]);
 
-            return $productCreated;
-        } catch (Exception $e) {
+            $purchase->updateStatus();
 
-            Log::error();
-
-            db::rollBack();
-
-            return null;
-
-        }
-
+            return $product;
+        });
     }
-
-    public function dataPivot($data, $productCreated)
-    {
-        $pivotData = $data->only('purchase_id', 'purchase_value');
-
-        $productCreated->purchases()->syncWithPivotValues(array_merge($pivotData, [
-            'product_id' => $productCreated->id,
-            'amount' => $productCreated->stock_quantity,
-        ]));
-    }
-
-    public function dataPurchase($data)
-    {
-        $purchase = Purchase::findOrFail($data->purchase_id);
-        $totalItemValue = $purchase->products()->sum('purchase_value');
-        $purchase->count_value = $purchase->value - $totalItemValue;
-
-        if($purchase->count_value === 0){
-            $purchase->status = StatusEnum::FINALIZADO->value;
-        }else if($purchase->count_value < 0){
-                $purchase->status = StatusEnum::ERRORESTOQUE->value;
-        }
-        $purchase->save();
-
-    }
-
 }

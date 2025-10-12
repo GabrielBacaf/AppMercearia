@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Api\V1\Purchase;
 
 use App\Enums\CategoryEnum;
+use App\Enums\PaymentStatusEnum;
+use App\Enums\PaymentTypeEnum;
 use App\Enums\PurchasePermissionEnum;
 use App\Enums\StatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
@@ -32,11 +34,13 @@ class StorePurchaseRequest extends FormRequest
             'description' => ['sometimes', 'string', 'max:255'],
             'purchase_date' => ['required', 'date', 'before_or_equal:today'],
             'status' => ['prohibited'],
-            'value' => ['required', 'numeric'],
             'count_value' => ['prohibited'],
-            'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
-            'invoice_id' => ['nullable', 'integer', 'exists:invoices,id'],
+            'supplier_id' => ['sometimes', 'integer', 'exists:suppliers,id'],
+            'invoice_id' => ['sometimes', 'integer', 'exists:invoices,id'],
 
+            'payment_type' => ['required', 'string', Rule::in(PaymentTypeEnum::values())],
+            'payment_status' => ['required', 'string', Rule::in(PaymentStatusEnum::values())],
+            'value' => ['required', 'numeric'],
         ];
     }
 
@@ -47,9 +51,11 @@ class StorePurchaseRequest extends FormRequest
             'description' => 'Descrição da Compra',
             'purchase_date' => 'Data de Compra',
             'count_value' => 'Contagem do valor da Compra',
-            'value' => 'Quantia da Compra',
+            'value' => 'Valor da Compra',
             'status' => 'Status',
             'supplier_id' => 'Fornecedor',
+            'payment_type' => 'Tipo de Pagamento',
+            'payment_status' => 'Status do Pagamento',
             'invoice_id' => 'Nota',
         ];
     }

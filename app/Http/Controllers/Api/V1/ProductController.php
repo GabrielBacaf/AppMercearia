@@ -9,13 +9,13 @@ use App\Http\Requests\Api\V1\Product\UpdateProductRequest;
 use App\Http\Resources\V1\Product\ProductResource;
 use App\Http\Services\ProductService;
 use App\Models\Product;
+use Illuminate\Support\Facades\Log;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Log;
 
 class ProductController extends Controller
 {
-    public function __construct(protected ProductService $productService){}
+    public function __construct(protected ProductService $productService) {}
 
     public function index(): JsonResponse
     {
@@ -30,18 +30,21 @@ class ProductController extends Controller
             200
         );
     }
-
     public function store(StoreProductRequest $request)
     {
         $this->authorize(ProductPermissionEnum::STORE->value);
 
-        $product = $this->productService->storeProduct($request->validated());
+        try {
+            $product = $this->productService->storeProduct($request->validated());
 
-        return $this->successResponse(
-            new ProductResource($product),
-            'Produto criado com sucesso!',
-            201
-        );
+            return $this->successResponse(
+                new ProductResource($product),
+                'Produto criado com sucesso!',
+                201
+            );
+        } catch (Exception $e) {
+            return $this->errorResponse('Ocorreu um erro ao criar o produto.', (array) $e->getMessage(), 500);
+        }
     }
 
     public function show(Product $product)
@@ -59,24 +62,25 @@ class ProductController extends Controller
     {
         $this->authorize(ProductPermissionEnum::UPDATE->value);
 
-        $validateData = $request->validated();
+        try {
+            $product = $this->productService->updateProduct($request->validated(), $product);
 
-        $product->update($validateData);
-
-        return $this->successResponse(
-            new ProductResource($product),
-            'Produto atualizado com sucesso!',
-            200
-        );
+            return $this->successResponse(
+                new ProductResource($product),
+                'Produto atualizado com sucesso!',
+                201
+            );
+        } catch (Exception $e) {
+            return $this->errorResponse('Ocorreu um erro ao atualizar o produto.', (array) $e->getMessage(), 500);
+        }
     }
-
 
     public function destroy(Product $product)
     {
         $this->authorize(ProductPermissionEnum::DESTROY->value);
 
         try {
-            // Ao excluir o produto, o banco já apaga os registros da tabela 'purchase_item' via CASCADE
+
             $product->delete();
 
             return $this->successResponse(
