@@ -24,7 +24,8 @@ class StoreProductRequest extends FormRequest
             'expiration_date' => ['sometimes', 'date', 'after_or_equal:today'],
             'sale_value' => ['required', 'numeric', 'min:0'],
             'category' => ['required', 'string', Rule::in(CategoryEnum::values())],
-            'stock_quantity' => ['required', 'integer', 'min:0'],
+            'stock_quantity' => ['prohibited'],
+            'amount' => ['required', 'integer', 'min:0'],
             'purchase_id' => ['required', 'integer', 'exists:purchases,id'],
             'purchase_value' => ['required', 'numeric'],
         ];
@@ -41,7 +42,8 @@ class StoreProductRequest extends FormRequest
             'category' => 'Categoria',
             'purchase_value' => 'Valor de Compra',
             'purchase_id' => 'Compra',
-            'stock_quantity' => 'Quantidade em Estoque',
+            'amount'=> 'Quantidade',
+            'stock_quantity' => 'Quantidade total em estoque',
         ];
     }
 
