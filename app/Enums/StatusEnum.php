@@ -6,11 +6,14 @@ enum StatusEnum: string
 {
     case PENDENTE = 'PENDENTE';
 
+
     case FINALIZADO = 'FINALIZADO';
+
+    case PAGAMENTO_PENDENTE = 'PAGAMENTO PENDENTE';
 
     case CANCELADO = 'CANCELADO';
 
-    case ERRORESTOQUE = 'Erro no cadastro de Estoque';
+    case ERRO_ESTOQUE = 'Valor Produtos Maiores - Cadastrado na Compra';
 
     public static function values(): array
     {
