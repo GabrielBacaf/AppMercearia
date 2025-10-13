@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\Auth;
 
 class Purchase extends Model
 {
@@ -24,6 +25,7 @@ class Purchase extends Model
         'count_value',
         'status',
         'purchase_date',
+        'updated_by',
     ];
 
     protected function casts(): array
@@ -61,24 +63,55 @@ class Purchase extends Model
     }
 
 
+    /**
+     * se for um crete ele deixa por padrão o status pendente.
+     * se for update ele só autaliza o usuario
+     * @return void
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function ($purchase) {
+
+            $purchase->status = StatusEnum::PENDENTE->value;
+
+            if (Auth::check() && !$purchase->user_id) {
+                $purchase->user_id = Auth::id();
+            }
+           
+        });
+
+        static::updating(function ($purchase) {
+            if (Auth::check()) {
+                $purchase->updated_by = Auth::id();
+            }
+        });
+    }
+
 
     public function updateStatus(): void
     {
-        $totalItemValue = $this->products->sum(fn($product) =>
 
-        $product->pivot->purchase_value * $product->pivot->amount);
+        $totalCostOfProducts = $this->products->sum(function ($product) {
+            return $product->pivot->purchase_value * $product->pivot->amount;
+        });
 
-        $totalPayments = $this->payments()->sum('value');
+        $totalPaid = $this->payments()->sum('value');
 
-        $this->count_value = $totalPayments - $totalItemValue;
+        $this->count_value = $totalPaid - $totalCostOfProducts;
 
         $hasPendingPayments = $this->payments()->where('payment_status', PaymentStatusEnum::DEVENDO->value)->exists();
 
-        if ($this->count_value < 0) {
-            $this->status = StatusEnum::ERRORESTOQUE->value;
-        } elseif ($this->count_value == 0 && !$hasPendingPayments) {
+        if ($this->count_value == 0 && !$hasPendingPayments) {
+
             $this->status = StatusEnum::FINALIZADO->value;
-        } else {
+        } elseif ($this->count_value == 0 && $hasPendingPayments) {
+
+            $this->status = StatusEnum::PAGAMENTO_PENDENTE->value;
+        } elseif ($this->count_value < 0) {
+
+            $this->status = StatusEnum::ERRO_ESTOQUE->value;
         }
 
         $this->save();

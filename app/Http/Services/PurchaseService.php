@@ -2,8 +2,7 @@
 
 namespace App\Http\Services;
 
-use Illuminate\Support\Facades\Auth;
-use App\Enums\StatusEnum;
+use App\Models\Payment;
 use App\Models\Purchase;
 use Illuminate\Support\Facades\DB;
 
@@ -14,16 +13,9 @@ class PurchaseService
     {
         return DB::transaction(function () use ($data) {
 
-            $purchaseData = collect($data)->except(['payment_type', 'payment_status', 'value', 'count_value'])->all();
-            $paymentData = collect($data)->only(['payment_type', 'payment_status', 'value'])->all();
+            $purchase = Purchase::create($data);
 
-            $purchase = Purchase::create(
-                array_merge($purchaseData, [
-                    'status' => StatusEnum::PENDENTE->value,
-                    'user_id' => Auth::id(),
-                ])
-            );
-            $purchase->payments()->create($paymentData);
+            Payment::syncPayments($purchase, $data['payments'] ?? []);
 
             return $purchase;
         });
@@ -34,16 +26,9 @@ class PurchaseService
     {
         return DB::transaction(function () use ($data, $purchase) {
 
-            $purchaseData = collect($data)->except(['payment_type', 'payment_status', 'value', 'count_value'])->all();
-            $paymentData = collect($data)->only(['payment_type', 'payment_status', 'value'])->all();
+            $purchase->update($data);
 
-            $purchase->update(
-                array_merge($purchaseData, [
-                    'user_id' => Auth::id(),
-                ])
-            );
-
-            $purchase->payments()->update([$paymentData]);
+            Payment::syncPayments($purchase, $data['payments'] ?? []);
 
             $purchase->updateStatus();
 
