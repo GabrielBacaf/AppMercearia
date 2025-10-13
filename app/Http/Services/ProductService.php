@@ -10,7 +10,9 @@ use Exception;
 
 class ProductService
 {
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     public function storeProduct(array $data): Product
     {
@@ -18,16 +20,15 @@ class ProductService
 
         return DB::transaction(function () use ($data, $purchase) {
 
-            $productData = collect($data)->except(['purchase_id', 'purchase_value'])->all();
-
+            $productData = collect($data)->except(['purchase_id', 'purchase_value', 'amount'])->all();
+            $productData['stock_quantity'] = $data['amount'];
             $product = Product::create($productData);
 
-
-            $purchase->products()->attach($product->id, [
+            $pivotData = [
                 'purchase_value' => $data['purchase_value'],
-                'amount' => $data['stock_quantity'],
-            ]);
-
+                'amount' => $data['amount'],
+            ];
+            $product->purchases()->attach($purchase->id, $pivotData);
 
             $purchase->updateStatus();
 
@@ -38,20 +39,24 @@ class ProductService
     public function updateProduct(array $data, Product $product): Product
     {
 
-        return DB::transaction(function () use ($data, $product) {
+        $purchase = Purchase::findOrFail($data['purchase_id']);
 
-            $purchase = Purchase::findOrFail($data['purchase_id']);
+        return DB::transaction(function () use ($data, $product, $purchase) {
 
-            $productData = collect($data)->except(['purchase_id', 'purchase_value'])->all();
+            $productData = collect($data)->except(['purchase_id', 'purchase_value', 'amount'])->all();
 
-            $product->update($productData);
+            $pivotData = [
+                'purchase_value' => $data['purchase_value'],
+                'amount' => $data['amount'],
+            ];
 
-            $product->purchases()->syncWithoutDetaching([
-                $purchase->id => [
-                    'purchase_value' => $data['purchase_value'],
-                    'amount' => $data['stock_quantity'],
-                ],
-            ]);
+            $product->purchases()->syncWithoutDetaching([$purchase->id => $pivotData]);
+
+            $product->fill($productData);
+
+            $product->stock_quantity = $product->purchases()->sum('amount');
+
+            $product->save();
 
             $purchase->updateStatus();
 

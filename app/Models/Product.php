@@ -19,6 +19,7 @@ class Product extends Model
         'stock_quantity',
         'purchase_id',
         'purchase_value',
+        'amount',
     ];
 
     protected function casts(): array

@@ -79,7 +79,7 @@ class Purchase extends Model
             if (Auth::check() && !$purchase->user_id) {
                 $purchase->user_id = Auth::id();
             }
-           
+
         });
 
         static::updating(function ($purchase) {
@@ -93,9 +93,12 @@ class Purchase extends Model
     public function updateStatus(): void
     {
 
-        $totalCostOfProducts = $this->products->sum(function ($product) {
-            return $product->pivot->purchase_value * $product->pivot->amount;
+        $pivotData = $this->products()->get(['product_purchase.purchase_value', 'product_purchase.amount']);
+
+        $totalCostOfProducts = $pivotData->sum(function ($pivot) {
+            return $pivot->purchase_value * $pivot->amount;
         });
+
 
         $totalPaid = $this->payments()->sum('value');
 
@@ -112,6 +115,9 @@ class Purchase extends Model
         } elseif ($this->count_value < 0) {
 
             $this->status = StatusEnum::ERRO_ESTOQUE->value;
+        } elseif ($this->count_value > 0) {
+
+            $this->status = StatusEnum::PENDENTE->value;
         }
 
         $this->save();
