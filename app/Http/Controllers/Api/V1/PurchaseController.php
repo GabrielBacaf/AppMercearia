@@ -77,7 +77,7 @@ class PurchaseController extends Controller
             return $this->successResponse(
                 new PurchaseResource($purchase->load('payments')),
                 "Compra e pagamento inicial atualizados com sucesso!",
-                201
+                200
             );
         } catch (Exception $e) {
             return $this->errorResponse('Ocorreu um erro ao atualizar a compra.', (array)$e->getMessage(), 500);

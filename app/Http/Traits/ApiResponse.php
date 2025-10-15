@@ -19,7 +19,7 @@ trait ApiResponse
     }
 
 
-    protected function errorResponse(string $message, array $errors = [], int $status): JsonResponse
+    protected function errorResponse(string $message, array $errors = [], int $status = 500): JsonResponse
     {
         return response()->json([
             'success' => false,
@@ -28,7 +28,7 @@ trait ApiResponse
         ], $status);
     }
 
-    protected function successResponseCollection(array|Model|JsonResource|null $data = [], mixed $resource, string $message = '', int $status = 200): JsonResponse
+    protected function successResponseCollection(array|Model|JsonResource|null $data = [], mixed $resource = [], string $message = '', int $status = 200): JsonResponse
     {
         return response()->json([
             'success' => true,
