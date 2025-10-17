@@ -68,7 +68,7 @@ class ProductController extends Controller
             return $this->successResponse(
                 new ProductResource($product),
                 'Produto atualizado com sucesso!',
-                201
+                200
             );
         } catch (Exception $e) {
             return $this->errorResponse('Ocorreu um erro ao atualizar o produto.', (array) $e->getMessage(), 500);
