@@ -26,8 +26,13 @@ class RoleController extends Controller
     public function index()
     {
         $this->authorize(RolePermissionEnum::INDEX->value);
-        $roles = Role::all();
-        return $this->successResponse(RoleResource::collection($roles), "Perfis listados com sucesso!", 200);
+        $roles = Role::paginate(5);
+        return $this->successResponseCollection(
+            RoleResource::collection($roles),
+            $roles,
+            "Perfis listados com sucesso!",
+            200
+        );
     }
 
     public function store(StoreRoleRequest $request)
@@ -42,10 +47,9 @@ class RoleController extends Controller
             );
         } catch (Throwable $e) {
             Log::error('Erro ao criar perfil', ['exception' => $e]);
-            return $this->errorResponse($e->getMessage(), [], 500);
+            return $this->errorResponse('Erro ao criar perfil', [], 500);
         }
     }
-
 
     public function update(UpdateRoleRequest $request, Role $role)
     {
@@ -63,15 +67,8 @@ class RoleController extends Controller
         } catch (Throwable $e) {
 
             Log::error('Erro ao ATUALIZAR perfil', ['exception' => $e]);
-            return $this->errorResponse($e->getMessage(), [], 500);
+            return $this->errorResponse('Erro ao ATUALIZAR perfil', [], 500);
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

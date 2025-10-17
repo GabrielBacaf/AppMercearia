@@ -19,7 +19,12 @@ class UserController extends Controller
 
         $users = User::paginate(5);
 
-        return $this->successResponse(UserResource::collection($users), 'Usuário listados com sucesso!', 200);
+        return $this->successResponseCollection(
+            UserResource::collection($users),
+            $users,
+            'Usuário listados com sucesso!',
+            200
+        );
     }
 
     public function store(StoreUserRequest $request): JsonResponse
