@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('fantasy_name')->nullable();
             $table->string('legal_name')->unique();
-            $table->string('cnpj', 14)->unique();
+            $table->string('cnpj', 14)->unique()->nullable();
             $table->timestamps();
         });
     }
