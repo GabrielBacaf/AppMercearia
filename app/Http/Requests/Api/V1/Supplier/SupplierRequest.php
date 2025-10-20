@@ -23,7 +23,7 @@ class SupplierRequest extends FormRequest
         return [
             'fantasy_name' => ['required', 'string', 'max:60'],
             'legal_name' => ['required', 'string', 'max:70', Rule::unique('suppliers', 'legal_name')->ignore($this->supplier)],
-            'cnpj' => ['required', 'string', 'max:14' , Rule::unique('suppliers', 'cnpj')->ignore($this->id)->ignore($this->supplier)],
+            'cnpj' => ['sometimes', 'string', 'max:14' , Rule::unique('suppliers', 'cnpj')->ignore($this->id)->ignore($this->supplier)],
 
         ];
     }
