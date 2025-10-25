@@ -18,7 +18,6 @@ return new class extends Migration {
             $table->date('purchase_date');
             $table->string('status');
             $table->foreignId('supplier_id')->nullable()->constrained('suppliers');
-            $table->foreignId('invoice_id')->nullable()->constrained('invoices');
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->timestamps();

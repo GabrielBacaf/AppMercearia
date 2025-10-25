@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use App\Models\Document;
 use App\Models\Payment;
 use App\Models\Purchase;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +17,7 @@ class PurchaseService
             $purchase = Purchase::create($data);
 
             Payment::syncPayments($purchase, $data['payments'] ?? []);
+            Document::syncDocuments($purchase, $data['documents'] ?? []);
 
             return $purchase;
         });
@@ -29,6 +31,7 @@ class PurchaseService
             $purchase->update($data);
 
             Payment::syncPayments($purchase, $data['payments'] ?? []);
+            Document::syncDocuments($purchase, $data['documents'] ?? []);
 
             $purchase->updateStatus();
 

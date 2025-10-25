@@ -40,10 +40,12 @@ class Purchase extends Model
         return $this->belongsTo(Supplier::class);
     }
 
-    public function invoice(): BelongsTo
+    public function documents(): MorphMany
     {
-        return $this->belongsTo(Invoice::class);
+        return $this->morphMany(Document::class, 'documentable');
     }
+
+
 
     public function user(): BelongsTo
     {
@@ -86,6 +88,14 @@ class Purchase extends Model
             if (Auth::check()) {
                 $purchase->updated_by = Auth::id();
             }
+        });
+
+        // Quando uma Purchase for deletada...
+        static::deleting(function ($purchase) {
+            // ...pegue todos os documentos e delete CADA UM.
+            $purchase->documents()->each(function ($document) {
+                $document->delete();
+            });
         });
     }
 
