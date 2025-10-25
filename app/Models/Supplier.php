@@ -16,7 +16,7 @@ class Supplier extends Model
         'cnpj',
     ];
 
-    public function purchases(): HasMany
+    public function purchase(): HasMany
     {
         return $this->hasMany(Purchase::class);
     }

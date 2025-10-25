@@ -8,11 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('invoices', function (Blueprint $table) {
+        Schema::create('documents', function (Blueprint $table) {
             $table->id();
-            $table->string('access_key', 44)->unique();
             $table->string('label');
-            $table->longText('file');
+            $table->string('file_path');
+            $table->string('mime_type')->nullable();
+            $table->morphs('documentable');
             $table->timestamps();
         });
     }
@@ -20,6 +21,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('invoices');
+        Schema::dropIfExists('documents');
     }
 };
