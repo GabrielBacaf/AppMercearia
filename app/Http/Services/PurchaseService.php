@@ -17,6 +17,7 @@ class PurchaseService
             $purchase = Purchase::create($data);
 
             Payment::syncPayments($purchase, $data['payments'] ?? []);
+            Document::syncDocuments($purchase, $data['documents'] ?? []);
 
             return $purchase;
         });
@@ -30,7 +31,6 @@ class PurchaseService
             $purchase->update($data);
 
             Payment::syncPayments($purchase, $data['payments'] ?? []);
-
             Document::syncDocuments($purchase, $data['documents'] ?? []);
 
             $purchase->updateStatus();
