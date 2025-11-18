@@ -13,22 +13,7 @@ use Tests\TestCase;
 # php artisan test --filter=RoleControllerTest
 class RoleControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
-    private User $user;
-    private string $token;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->user = User::factory()->create();
-        $this->token = $this->user->createToken('test-token')->plainTextToken;
-
-        Permission::create(['name' => RolePermissionEnum::INDEX->value, 'guard_name' => 'api']);
-        Permission::create(['name' => RolePermissionEnum::STORE->value, 'guard_name' => 'api']);
-    }
-
-     # php artisan test --filter=RoleControllerTest::test_index_deve_retornar_erro_403_se_nao_autorizado
+    # php artisan test --filter=RoleControllerTest::test_index_deve_retornar_erro_403_se_nao_autorizado
     public function test_index_deve_retornar_erro_403_se_nao_autorizado(): void
     {
         $response = $this->withHeader('Authorization', "Bearer $this->token")
@@ -37,7 +22,7 @@ class RoleControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-      # php artisan test --filter=RoleControllerTest::test_index_deve_listar_perfis_com_sucesso
+    # php artisan test --filter=RoleControllerTest::test_index_deve_listar_perfis_com_sucesso
     public function test_index_deve_listar_perfis_com_sucesso(): void
     {
         $this->user->givePermissionTo(RolePermissionEnum::INDEX->value);
@@ -47,10 +32,10 @@ class RoleControllerTest extends TestCase
             ->getJson(route('roles.index'));
 
         $response->assertStatus(200)
-            ->assertJsonCount(3, 'data');
+            ->assertJsonCount(4, 'data');
     }
 
-     # php artisan test --filter=RoleControllerTest::test_store_deve_retornar_erro_403_se_nao_autorizado
+    # php artisan test --filter=RoleControllerTest::test_store_deve_retornar_erro_403_se_nao_autorizado
     public function test_store_deve_retornar_erro_403_se_nao_autorizado(): void
     {
         $roleData = ['name' => 'New Role', 'permissions' => []];
@@ -59,7 +44,7 @@ class RoleControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-     # php artisan test --filter=RoleControllerTest::test_store_deve_retornar_erro_de_validacao_com_dados_invalidos
+    # php artisan test --filter=RoleControllerTest::test_store_deve_retornar_erro_de_validacao_com_dados_invalidos
     public function test_store_deve_retornar_erro_de_validacao_com_dados_invalidos(): void
     {
         $this->user->givePermissionTo(RolePermissionEnum::STORE->value);
@@ -72,7 +57,7 @@ class RoleControllerTest extends TestCase
             ->assertJsonValidationErrors(['name', 'permissions']);
     }
 
-     # php artisan test --filter=RoleControllerTest::test_store_deve_criar_perfil_com_sucesso
+    # php artisan test --filter=RoleControllerTest::test_store_deve_criar_perfil_com_sucesso
     public function test_store_deve_criar_perfil_com_sucesso(): void
     {
         $this->user->givePermissionTo(RolePermissionEnum::STORE->value);

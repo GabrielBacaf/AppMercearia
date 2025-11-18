@@ -12,25 +12,12 @@ use Tests\TestCase;
 # php artisan test --filter=UserControllerTest
 class UserControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
-    private User $user;
     private Role $role;
-    private string $token;
-
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
-
-        $this->token = $this->user->createToken('Pc-Baca')->plainTextToken;
-
         $this->role = Role::create(['name' => 'Test Role', 'guard_name' => 'api']);
-
-        foreach (UserPermissionEnum::cases() as $permissionEnum) {
-            Permission::create(['name' => $permissionEnum->value, 'guard_name' => 'api']);
-        }
     }
 
     # php artisan test --filter=UserControllerTest::test_listar_todos_usuarios_com_sucesso

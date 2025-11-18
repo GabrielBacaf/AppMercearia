@@ -15,10 +15,6 @@ use Tests\TestCase;
 # php artisan test --filter=ProductControllerTest
 class ProductControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
-    private User $user;
-
     private Purchase $purchase;
 
     private Payment $payment;
@@ -28,15 +24,9 @@ class ProductControllerTest extends TestCase
 
     private array $productMake;
 
-    private string $token;
-
-
-
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->user = User::factory()->create();
 
         $this->purchase = Purchase::factory()->create([
             'user_id' => $this->user->id,
@@ -58,12 +48,6 @@ class ProductControllerTest extends TestCase
 
         $this->product = Product::factory()->create();
 
-
-        foreach (ProductPermissionEnum::cases() as $permission) {
-            Permission::create(['name' => $permission->value, 'guard_name' => 'api']);
-        }
-
-        $this->token = $this->user->createToken('test-token')->plainTextToken;
     }
 
     #php artisan test --filter=ProductControllerTest::test_deve_listar_produtos

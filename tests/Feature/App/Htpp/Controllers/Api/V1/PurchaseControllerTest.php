@@ -16,22 +16,12 @@ use Tests\TestCase;
 # php artisan test --filter=PurchaseControllerTest
 class PurchaseControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
-    private User $user;
-    private string $token;
-
     private Purchase $purchase;
-
     private Payment $payment;
-
-
 
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->user = User::factory()->create();
 
         $this->purchase = Purchase::factory()->create([
             'user_id' => $this->user->id,
@@ -42,11 +32,6 @@ class PurchaseControllerTest extends TestCase
             'payable_type' => Purchase::class,
         ]);
 
-        $this->token = $this->user->createToken('test-token')->plainTextToken;
-
-        foreach (PurchasePermissionEnum::cases() as $permission) {
-            Permission::create(['name' => $permission->value, 'guard_name' => 'api']);
-        }
     }
 
 
@@ -220,7 +205,7 @@ class PurchaseControllerTest extends TestCase
 
         //Act
         $response = $this->withHeader('Authorization', "Bearer $this->token")
-            ->postJson(route('purchases.store'),  $dados);
+            ->postJson(route('purchases.store'), $dados);
 
         //Assert
         $response->assertStatus(201)
