@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\ClientController;
 use App\Http\Controllers\Api\V1\PermissionController;
 
 use App\Http\Controllers\Api\V1\ProductController;
@@ -23,5 +24,6 @@ Route::prefix('v1')->group(function () {
         Route::get('permissions', [PermissionController::class, 'index'])->name('permissions.index');
         Route::apiResource('purchases', PurchaseController::class);
         Route::apiResource('suppliers', SupplierController::class)->except('destroy');
+        Route::apiResource('clients', ClientController::class)->except('destroy');
     });
 });
