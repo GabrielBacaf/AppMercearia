@@ -4,8 +4,6 @@ namespace App\Http\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-v
-
 trait SyncPayments
 {
     public static function syncPayments(Model $model, array $paymentsData): void

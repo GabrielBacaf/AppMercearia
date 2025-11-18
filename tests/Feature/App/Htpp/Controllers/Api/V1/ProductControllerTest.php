@@ -242,7 +242,7 @@ class ProductControllerTest extends TestCase
 
         //Act
         $reponse = $this->withHeader('Authorization', "Bearer $this->token")
-            ->putJson(route('products.update', 9999999999999999999), $this->productMake);
+            ->putJson(route('products.update', 999999999999999999), $this->productMake);
 
         //Assert
         $reponse->assertStatus(404);
