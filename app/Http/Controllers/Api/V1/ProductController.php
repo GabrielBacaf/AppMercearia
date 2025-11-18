@@ -19,7 +19,7 @@ class ProductController extends Controller
 
     public function index(): JsonResponse
     {
-        $this->authorize(ProductPermissionEnum::INDEX);
+        $this->authorize(ProductPermissionEnum::INDEX->value);
 
         $products = Product::paginate(5);
 

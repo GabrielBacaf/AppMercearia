@@ -54,7 +54,7 @@ class UpdatePurchaseRequest extends FormRequest
             'document_files.*' => ['sometimes','file','mimes:pdf','max:5120'],
 
             //Array de labels
-            'document_labels'    => ['sometimes','array','size:' . $fileCount],
+            'document_labels'    => ['sometimes','array','size:' ],
             'document_labels.*'  => ['sometimes','string','max:255'],
         ];
     }

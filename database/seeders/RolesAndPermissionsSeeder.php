@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ClientPermissionEnum;
 use App\Enums\PermissionEnum;
 use App\Enums\ProductPermissionEnum;
 use App\Enums\PurchasePermissionEnum;
@@ -36,6 +37,7 @@ class RolesAndPermissionsSeeder extends Seeder
             ProductPermissionEnum::class,
             PurchasePermissionEnum::class,
             SupplierPermissionEnum::class,
+            ClientPermissionEnum::class,
         ];
 
         $allPermissions = [];

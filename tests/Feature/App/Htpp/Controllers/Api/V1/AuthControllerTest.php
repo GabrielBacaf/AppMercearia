@@ -1,25 +1,13 @@
 <?php
 
 namespace Tests\Feature\App\Htpp\Controllers\Api\V1;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
  # php artisan test --filter=AuthControllerTest
 class AuthControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
-    private $user;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->user = User::factory()->create();
-    }
-
     # php artisan test --filter=AuthControllerTest::test_logando_com_sucesso
     public function test_logando_com_sucesso()
     {
@@ -53,13 +41,8 @@ class AuthControllerTest extends TestCase
     # php artisan test --filter=AuthControllerTest::test_deslogando_com_sucesso
     public function test_deslogando_com_sucesso(): void
     {
-
-        //Arrange
-        $token = $this->user->createToken('testing')->plainTextToken;
-
-
         //Act
-        $response = $this->withHeader('Authorization', "Bearer $token")
+        $response = $this->withHeader('Authorization', "Bearer $this->token")
             ->postJson(route('logout'));
 
         //Assert
