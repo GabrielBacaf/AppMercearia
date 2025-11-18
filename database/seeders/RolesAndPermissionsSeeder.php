@@ -7,6 +7,7 @@ use App\Enums\PermissionEnum;
 use App\Enums\ProductPermissionEnum;
 use App\Enums\PurchasePermissionEnum;
 use App\Enums\RolePermissionEnum;
+use App\Enums\SalesPermissionEnum;
 use App\Enums\SupplierPermissionEnum;
 use App\Enums\UserPermissionEnum;
 use Spatie\Permission\Models\Role;
@@ -38,6 +39,7 @@ class RolesAndPermissionsSeeder extends Seeder
             PurchasePermissionEnum::class,
             SupplierPermissionEnum::class,
             ClientPermissionEnum::class,
+            SalesPermissionEnum::class,
         ];
 
         $allPermissions = [];
