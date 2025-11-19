@@ -25,7 +25,7 @@ class PurchaseResource extends JsonResource
             'status' => $this->status,
             'user_id' => $this->user_id,
 
-            // ✅ Carregando os pagamentos corretamente
+            //  Carregando os pagamentos corretamente
             'payments' => $this->whenLoaded('payments', function () {
                 return $this->payments->map(function ($payment) {
                     return [
