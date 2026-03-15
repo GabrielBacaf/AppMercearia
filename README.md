@@ -118,13 +118,3 @@ Este projeto segue um modelo de fluxo estruturado (GitFlow). Para contribuir:
 ## 📝 Licença
 
 Este projeto está sob a licença [MIT](https://choosealicense.com/licenses/mit/). Sinta-se à vontade para usá-lo, modificá-lo e distribuí-lo para fins educacionais ou comerciais.
-
----
-
-## ✨ Owners / Contribuidores
-
-Pessoas que construíram e mantêm a arquitetura deste projeto:
-
-| [<img loading="lazy" src="https://github.com/GabrielBacaf.png" width=115><br><sub>Gabriel Baca</sub>](https://github.com/GabrielBacaf) |
-| :---: |
-| Desenvolvedor Backend<br>Engenharia de Computação |
