@@ -1,0 +1,50 @@
+name: Executar Testes da Mercearia
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: AppMercearia_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2' # Use a versão que você checou antes!
+        extensions: mbstring, dom, curl, libxml, mysql
+        coverage: none
+
+    - name: Copiar .env de teste
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+    - name: Instalar Dependências (Composer)
+      run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+    - name: Gerar Key
+      run: php artisan key:generate
+
+    - name: Executar Migrations e Testes
+      env:
+        DB_CONNECTION: mysql
+        DB_HOST: 127.0.0.1
+        DB_PORT: 3306
+        DB_DATABASE: AppMercearia_test
+        DB_USERNAME: root
+        DB_PASSWORD: password
+      run: php artisan test
