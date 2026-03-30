@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\PurchaseController;
 use App\Http\Controllers\Api\V1\RoleController;
+use App\Http\Controllers\Api\V1\SaleController;
 use App\Http\Controllers\Api\V1\SupplierController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
@@ -25,5 +26,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('purchases', PurchaseController::class);
         Route::apiResource('suppliers', SupplierController::class)->except('destroy');
         Route::apiResource('clients', ClientController::class)->except('destroy');
+        Route::apiResource('sales', SaleController::class);
     });
 });
