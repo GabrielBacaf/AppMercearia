@@ -45,8 +45,6 @@ class Purchase extends Model
         return $this->morphMany(Document::class, 'documentable');
     }
 
-
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -81,7 +79,6 @@ class Purchase extends Model
             if (Auth::check() && !$purchase->user_id) {
                 $purchase->user_id = Auth::id();
             }
-
         });
 
         static::updating(function ($purchase) {
