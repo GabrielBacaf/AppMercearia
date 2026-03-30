@@ -9,6 +9,7 @@ class Sale extends Model
 {
     protected $fillable = [
         'discount',
+        'total_value',
         'delivery_price',
         'user_id',
         'updated_by',
@@ -25,9 +26,16 @@ class Sale extends Model
         return $this->belongsTo(Client::class);
     }
 
-    public function payments()
+   public function payments()
     {
-        return $this->hasMany(Payment::class);
+    
+        return $this->morphMany(Payment::class, 'payable');
     }
 
+    public function products()
+    {
+        return $this->belongsToMany(Product::class)
+            ->withPivot('amount', 'sale_value')
+            ->withTimestamps();
+    }
 }
