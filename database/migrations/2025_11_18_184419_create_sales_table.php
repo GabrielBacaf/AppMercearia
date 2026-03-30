@@ -6,15 +6,14 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    /**
-     * Run the migrations.
-     */
+
     public function up(): void
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
-            $table->decimal('discount', 2);
-            $table->decimal('delivery_price', 2);
+            $table->decimal('total_value', 10, 2);
+            $table->decimal('discount', 10, 2)->default(0);
+            $table->decimal('delivery_price', 10, 2)->default(0);
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->foreignId('client_id')->nullable()->constrained('clients');
