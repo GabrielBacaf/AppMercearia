@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\ClientController;
+use App\Http\Controllers\Api\V1\EnumController;
 use App\Http\Controllers\Api\V1\PermissionController;
 
 use App\Http\Controllers\Api\V1\ProductController;
@@ -19,6 +20,9 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+        
+        Route::get('enums', [EnumController::class, 'index'])->name('enums.index');
+
         Route::apiResource('users', UserController::class);
         Route::apiResource('roles', RoleController::class)->except('destroy');
         Route::apiResource('products', ProductController::class);

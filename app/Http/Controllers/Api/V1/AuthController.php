@@ -15,6 +15,7 @@ class AuthController extends Controller
 
     public function login(AuthRequest $request): JsonResponse
     {
+        \Log::info('Login attempt', $request->all());
         if (Auth::attempt($request->only('login', 'password'))) {
             return $this->successResponse(
                 [

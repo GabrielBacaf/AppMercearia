@@ -37,6 +37,18 @@ class PurchaseResource extends JsonResource
                     ];
                 });
             }),
+
+            // Carregando os produtos corretamente
+            'products' => $this->whenLoaded('products', function () {
+                return $this->products->map(function ($product) {
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'amount' => $product->pivot->amount,
+                        'purchase_value' => $product->pivot->purchase_value,
+                    ];
+                });
+            }),
         ];
     }
 }

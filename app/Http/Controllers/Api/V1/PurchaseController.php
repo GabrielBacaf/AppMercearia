@@ -56,7 +56,7 @@ class PurchaseController extends Controller
         $this->authorize(PurchasePermissionEnum::SHOW->value);
 
         return $this->successResponse(
-            new PurchaseResource($purchase->load('payments')),
+            new PurchaseResource($purchase->load(['payments', 'products'])),
             'Compra detalhado com sucesso!',
             200
         );
