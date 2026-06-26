@@ -18,11 +18,27 @@ class PurchaseController extends Controller
 
     public function __construct(protected PurchaseService $purchaseService) {}
 
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
         $this->authorize(PurchasePermissionEnum::INDEX->value);
 
-        $purchase = Purchase::paginate(5);
+        $query = Purchase::query();
+        
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('status', 'like', "%{$search}%");
+            });
+        }
+        if ($request->filled('date_start')) {
+            $query->whereDate('created_at', '>=', $request->input('date_start'));
+        }
+        if ($request->filled('date_end')) {
+            $query->whereDate('created_at', '<=', $request->input('date_end'));
+        }
+
+        $purchase = $query->paginate(5);
         return $this->successResponseCollection(
             PurchaseResource::collection($purchase->load('payments')),
             $purchase,

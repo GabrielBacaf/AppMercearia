@@ -23,10 +23,17 @@ class RoleController extends Controller
     {
     }
 
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
         $this->authorize(RolePermissionEnum::INDEX->value);
-        $roles = Role::paginate(5);
+        
+        $query = Role::query();
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('name', 'like', "%{$search}%");
+        }
+        
+        $roles = $query->paginate(5);
         return $this->successResponseCollection(
             RoleResource::collection($roles),
             $roles,

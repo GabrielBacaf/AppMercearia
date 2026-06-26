@@ -17,11 +17,25 @@ class ProductController extends Controller
 {
     public function __construct(protected ProductService $productService) {}
 
-    public function index(): JsonResponse
+    public function index(\Illuminate\Http\Request $request): JsonResponse
     {
         $this->authorize(ProductPermissionEnum::INDEX->value);
 
-        $products = Product::paginate(5);
+        $query = Product::query();
+        
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('barcode', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->has('barcode')) {
+            $query->where('barcode', $request->barcode);
+        }
+
+        $products = $query->paginate(5);
 
         return $this->successResponseCollection(
             ProductResource::collection($products),

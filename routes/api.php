@@ -29,6 +29,7 @@ Route::prefix('v1')->group(function () {
         Route::get('permissions', [PermissionController::class, 'index'])->name('permissions.index');
         Route::apiResource('purchases', PurchaseController::class);
         Route::apiResource('suppliers', SupplierController::class)->except('destroy');
+        Route::post('clients/extract-location', [ClientController::class, 'extractLocation'])->name('clients.extract-location');
         Route::apiResource('clients', ClientController::class)->except('destroy');
         Route::apiResource('sales', SaleController::class);
     });

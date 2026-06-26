@@ -13,11 +13,20 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(\Illuminate\Http\Request $request): JsonResponse
     {
         $this->authorize(UserPermissionEnum::INDEX->value);
 
-        $users = User::paginate(5);
+        $query = User::query();
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->paginate(5);
 
         return $this->successResponseCollection(
             UserResource::collection($users),

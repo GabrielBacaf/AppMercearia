@@ -18,18 +18,18 @@ class ClientRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['sometimes', 'string', 'email', 'max:255', Rule::unique('clients', 'email')->ignore($this->client)],
-            'phone' => ['sometimes', 'string', 'max:20', Rule::unique('clients', 'phone')->ignore($this->client)],
-            'address' => ['sometimes', 'array'],
-            'address.street' => ['sometimes', 'string', 'max:255'],
-            'address.number' => ['sometimes', 'string', 'max:50'],
-            'address.complement' => ['sometimes', 'string', 'max:255'],
-            'address.city' => ['sometimes', 'string', 'max:100'],
-            'address.state' => ['sometimes', 'string', 'max:100'],
-            'address.postal_code' => ['sometimes', 'string', 'max:20'],
-            'address.country' => ['sometimes', 'string', 'max:100'],
-            'address.latitude' => ['sometimes', 'numeric'],
-            'address.longitude' => ['sometimes', 'numeric'],
+            'email' => ['nullable', 'string', 'email', 'max:255', Rule::unique('clients', 'email')->ignore($this->client)],
+            'phone' => ['nullable', 'string', 'max:20', Rule::unique('clients', 'phone')->ignore($this->client)],
+            'address' => ['nullable', 'array'],
+            'address.street' => ['nullable', 'string', 'max:255'],
+            'address.number' => ['nullable', 'string', 'max:50'],
+            'address.complement' => ['nullable', 'string', 'max:255'],
+            'address.city' => ['nullable', 'string', 'max:100'],
+            'address.state' => ['nullable', 'string', 'max:100'],
+            'address.postal_code' => ['nullable', 'string', 'max:20'],
+            'address.country' => ['nullable', 'string', 'max:100'],
+            'address.latitude' => ['nullable', 'numeric'],
+            'address.longitude' => ['nullable', 'numeric'],
         ];
     }
 

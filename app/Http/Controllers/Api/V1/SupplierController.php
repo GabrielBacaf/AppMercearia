@@ -9,11 +9,20 @@ use App\Models\Supplier;
 
 class SupplierController extends Controller
 {
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
         $this->authorize(SupplierPermissionEnum::INDEX->value);
 
-        $suppliers = Supplier::paginate(5);
+        $query = Supplier::query();
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('fantasy_name', 'like', "%{$search}%")
+                  ->orWhere('cnpj', 'like', "%{$search}%");
+            });
+        }
+
+        $suppliers = $query->paginate(5);
 
         return $this->successResponseCollection(
             SupplierResource::collection($suppliers),

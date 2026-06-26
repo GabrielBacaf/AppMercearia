@@ -141,7 +141,7 @@ class ClienteControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['name', 'email', 'phone']);
+        $response->assertJsonValidationErrors(['name']);
     }
 
     #php artisan test --filter=ClienteControllerTest::test_store_deve_criar_cliente_com_endereco_com_sucesso

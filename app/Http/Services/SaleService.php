@@ -49,4 +49,26 @@ public function store(array $data)
             return $sale;
         });
     }
+
+    public function update(Sale $sale, array $data)
+    {
+        return DB::transaction(function () use ($sale, $data) {
+            
+            if (isset($data['discount']) || isset($data['delivery_price'])) {
+                $discount = $data['discount'] ?? $sale->discount;
+                $delivery = $data['delivery_price'] ?? $sale->delivery_price;
+                
+                $sale->load('products');
+                
+                $subTotal = $sale->products->sum(function($product) {
+                    return $product->pivot->amount * $product->pivot->sale_value;
+                });
+                
+                $data['total_value'] = ($subTotal + $delivery) - $discount;
+            }
+            
+            $sale->update($data);
+            return $sale;
+        });
+    }
 }
