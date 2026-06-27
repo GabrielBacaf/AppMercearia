@@ -26,7 +26,7 @@ class UserController extends Controller
             });
         }
 
-        $users = $query->paginate(5);
+        $users = $query->latest()->paginate(5);
 
         return $this->successResponseCollection(
             UserResource::collection($users),

@@ -22,7 +22,7 @@ class SupplierController extends Controller
             });
         }
 
-        $suppliers = $query->paginate(5);
+        $suppliers = $query->latest()->paginate(5);
 
         return $this->successResponseCollection(
             SupplierResource::collection($suppliers),

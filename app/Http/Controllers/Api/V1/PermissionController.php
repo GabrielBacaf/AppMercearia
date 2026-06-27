@@ -17,7 +17,7 @@ class PermissionController extends Controller
     {
         $this->authorize(PermissionEnum::INDEX->value);
 
-        $permissions = Permission::paginate(5);
+        $permissions = Permission::latest()->paginate(5);
 
         return $this->successResponseCollection(
             PermissionResource::collection($permissions),

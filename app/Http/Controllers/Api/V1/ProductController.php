@@ -35,7 +35,7 @@ class ProductController extends Controller
             $query->where('barcode', $request->barcode);
         }
 
-        $products = $query->paginate(5);
+        $products = $query->latest()->paginate(5);
 
         return $this->successResponseCollection(
             ProductResource::collection($products),

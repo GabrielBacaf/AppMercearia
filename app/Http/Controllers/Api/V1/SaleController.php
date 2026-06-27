@@ -32,7 +32,7 @@ class SaleController extends Controller
             $query->whereDate('created_at', '<=', $request->input('date_end'));
         }
 
-        $sales = $query->paginate(5);
+        $sales = $query->latest()->paginate(5);
         return $this->successResponseCollection(
             SaleResource::collection($sales),
             $sales,

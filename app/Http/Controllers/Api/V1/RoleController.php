@@ -33,7 +33,7 @@ class RoleController extends Controller
             $query->where('name', 'like', "%{$search}%");
         }
         
-        $roles = $query->paginate(5);
+        $roles = $query->latest()->paginate(5);
         return $this->successResponseCollection(
             RoleResource::collection($roles),
             $roles,

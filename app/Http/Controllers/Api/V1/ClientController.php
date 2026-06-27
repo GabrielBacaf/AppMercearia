@@ -29,7 +29,7 @@ class ClientController extends Controller
             });
         }
 
-        $clients = $query->paginate(5);
+        $clients = $query->latest()->paginate(5);
         return $this->successResponseCollection(
             ClientResource::collection($clients),
             $clients,
