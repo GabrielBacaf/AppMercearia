@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\Purchase\StorePurchaseRequest;
 use App\Http\Requests\Api\V1\Purchase\UpdatePurchaseRequest;
 use App\Http\Resources\V1\Purchase\PurchaseResource;
 use App\Http\Services\PurchaseService;
+use App\Models\Product;
 use App\Models\Purchase;
 use Exception;
 use function PHPUnit\Framework\isNull;
@@ -38,7 +39,7 @@ class PurchaseController extends Controller
             $query->whereDate('created_at', '<=', $request->input('date_end'));
         }
 
-        $purchase = $query->paginate(5);
+        $purchase = $query->latest()->paginate(5);
         return $this->successResponseCollection(
             PurchaseResource::collection($purchase->load('payments')),
             $purchase,
@@ -113,5 +114,23 @@ class PurchaseController extends Controller
         }
 
         return $this->errorResponse('A compra possui vinculo com produtos', [], 500);
+    }
+
+    public function removeProduct(Purchase $purchase, Product $product)
+    {
+        $this->authorize(PurchasePermissionEnum::UPDATE->value); // Assuming update permission is enough
+
+        try {
+            $purchase->products()->detach($product->id);
+            $purchase->updateStatus();
+
+            return $this->successResponse(
+                new PurchaseResource($purchase->load('payments', 'products')),
+                'Produto desvinculado da compra com sucesso!',
+                200
+            );
+        } catch (Exception $e) {
+            return $this->errorResponse('Ocorreu um erro ao desvincular o produto.', (array)$e->getMessage(), 500);
+        }
     }
 }

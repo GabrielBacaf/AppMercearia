@@ -270,4 +270,35 @@ class PurchaseControllerTest extends TestCase
             ->assertJsonPath('data.title', 'Compra Teste')
             ->assertJsonPath('data.description', 'Descrição da compra teste');
     }
+
+    # php artisan test --filter=PurchaseControllerTest::test_remove_product_deve_remover_produto_da_compra_com_sucesso
+    public function test_remove_product_deve_remover_produto_da_compra_com_sucesso(): void
+    {
+        // Arrange
+        $this->user->givePermissionTo(PurchasePermissionEnum::UPDATE->value);
+
+        $product = \App\Models\Product::factory()->create();
+        $this->purchase->products()->attach($product->id, [
+            'amount' => 2,
+            'purchase_value' => 50
+        ]);
+
+        $this->assertDatabaseHas('product_purchase', [
+            'purchase_id' => $this->purchase->id,
+            'product_id' => $product->id
+        ]);
+
+        // Act
+        $response = $this->withHeader('Authorization', "Bearer $this->token")
+            ->deleteJson(route('purchases.products.destroy', ['purchase' => $this->purchase->id, 'product' => $product->id]));
+
+        // Assert
+        $response->assertStatus(200)
+            ->assertJsonPath('message', 'Produto desvinculado da compra com sucesso!');
+
+        $this->assertDatabaseMissing('product_purchase', [
+            'purchase_id' => $this->purchase->id,
+            'product_id' => $product->id
+        ]);
+    }
 }

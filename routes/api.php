@@ -28,6 +28,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('products', ProductController::class);
         Route::get('permissions', [PermissionController::class, 'index'])->name('permissions.index');
         Route::apiResource('purchases', PurchaseController::class);
+        Route::delete('purchases/{purchase}/products/{product}', [PurchaseController::class, 'removeProduct'])->name('purchases.products.destroy');
         Route::apiResource('suppliers', SupplierController::class)->except('destroy');
         Route::post('clients/extract-location', [ClientController::class, 'extractLocation'])->name('clients.extract-location');
         Route::apiResource('clients', ClientController::class)->except('destroy');
