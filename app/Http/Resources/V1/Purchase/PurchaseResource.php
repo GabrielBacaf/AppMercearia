@@ -44,8 +44,12 @@ class PurchaseResource extends JsonResource
                     return [
                         'id' => $product->id,
                         'name' => $product->name,
-                        'amount' => $product->pivot->amount,
-                        'purchase_value' => $product->pivot->purchase_value,
+                        'barcode' => $product->barcode,
+                        'pivot' => [
+                            'amount' => $product->pivot->amount,
+                            'purchase_value' => $product->pivot->purchase_value,
+                            'expiration_date' => $product->pivot->expiration_date,
+                        ],
                     ];
                 });
             }),

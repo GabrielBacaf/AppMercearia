@@ -58,7 +58,7 @@ class Purchase extends Model
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class)
-            ->withPivot('amount', 'purchase_value')
+            ->withPivot('amount', 'purchase_value', 'expiration_date')
             ->withTimestamps();
     }
 

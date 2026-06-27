@@ -21,6 +21,7 @@ return new class extends Migration {
                 ->onDelete('cascade');
 
             $table->decimal('amount', 10, 2);
+            $table->date('expiration_date')->nullable();
             $table->decimal('purchase_value', 10, 2);
             $table->timestamps();
         });

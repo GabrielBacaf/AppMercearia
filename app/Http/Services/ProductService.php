@@ -27,6 +27,7 @@ class ProductService
             $pivotData = [
                 'purchase_value' => $data['purchase_value'],
                 'amount' => $data['amount'],
+                'expiration_date' => $data['expiration_date'] ?? null,
             ];
             $product->purchases()->attach($purchase->id, $pivotData);
 
@@ -48,6 +49,7 @@ class ProductService
             $pivotData = [
                 'purchase_value' => $data['purchase_value'],
                 'amount' => $data['amount'],
+                'expiration_date' => $data['expiration_date'] ?? null,
             ];
 
             $product->purchases()->syncWithoutDetaching([$purchase->id => $pivotData]);
