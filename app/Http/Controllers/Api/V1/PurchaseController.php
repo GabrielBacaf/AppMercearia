@@ -10,7 +10,6 @@ use App\Http\Services\PurchaseService;
 use App\Models\Product;
 use App\Models\Purchase;
 use Exception;
-use function PHPUnit\Framework\isNull;
 
 
 
@@ -106,14 +105,12 @@ class PurchaseController extends Controller
     {
         $this->authorize(PurchasePermissionEnum::DESTROY->value);
 
-        $validateData = $purchase->products() ?? null;
-
-        if (isNull($validateData)) {
-            $purchase->delete();
-            return $this->successResponse([], 'Compra deletado com sucesso!', 200);
+        if ($purchase->products()->exists()) {
+            return $this->errorResponse('A compra possui vinculo com produtos', [], 500);
         }
 
-        return $this->errorResponse('A compra possui vinculo com produtos', [], 500);
+        $purchase->delete();
+        return $this->successResponse([], 'Compra deletada com sucesso!', 200);
     }
 
     public function removeProduct(Purchase $purchase, Product $product)

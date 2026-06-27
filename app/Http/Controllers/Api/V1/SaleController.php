@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\SalePermissionEnum;
-use App\Enums\SalesPermissionEnum;
 use App\Http\Requests\Api\V1\Sale\StoreSaleRequest;
 use App\Http\Requests\Api\V1\Sale\UpdateSaleRequest;
 use App\Http\Resources\V1\Sale\SaleResource;
@@ -65,7 +64,7 @@ class SaleController extends Controller
 
     public function show($id)
     {
-        $this->authorize(SalePermissionEnum::INDEX->value);
+        $this->authorize(SalePermissionEnum::SHOW->value);
 
         $sale = Sale::with('products', 'client', 'payments')->findOrFail($id);
 
