@@ -1,13 +1,13 @@
 <?php
 
-namespace Tests\Feature\App\Htpp\Controllers\Api\V1;
+namespace Tests\Feature\App\Http\Controllers\Api\V1;
 
 use App\Enums\ClientPermissionEnum;
 use App\Models\Client;
 use Tests\TestCase;
 
-# php artisan test --filter=ClienteControllerTest
-class ClienteControllerTest extends TestCase
+# php artisan test --filter=ClientControllerTest
+class ClientControllerTest extends TestCase
 {
     private Client $client;
 
@@ -17,7 +17,7 @@ class ClienteControllerTest extends TestCase
         $this->client = Client::factory()->create();
     }
 
-    # php artisan test --filter=ClienteControllerTest::test_deve_listar_clientes_com_sucesso
+    # php artisan test --filter=ClientControllerTest::test_deve_listar_clientes_com_sucesso
     public function test_deve_listar_clientes_com_sucesso(): void
     {
         //Arrange
@@ -40,7 +40,7 @@ class ClienteControllerTest extends TestCase
         $response->assertJsonCount(1, 'data');
     }
 
-    # php artisan test --filter=ClienteControllerTest::test_index_deve_retornar_erro_403_se_nao_autorizado
+    # php artisan test --filter=ClientControllerTest::test_index_deve_retornar_erro_403_se_nao_autorizado
     public function test_index_deve_retornar_erro_403_se_nao_autorizado(): void
     {
         // Act
@@ -51,7 +51,7 @@ class ClienteControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-    # php artisan test --filter=ClienteControllerTest::test_show_deve_retornar_erro_403_se_nao_autorizado
+    # php artisan test --filter=ClientControllerTest::test_show_deve_retornar_erro_403_se_nao_autorizado
     public function test_show_deve_retornar_erro_403_se_nao_autorizado(): void
     {
         // Act
@@ -62,7 +62,7 @@ class ClienteControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-    # php artisan test --filter=ClienteControllerTest::test_show_deve_retornar_erro_404_para_cliente_inexistente
+    # php artisan test --filter=ClientControllerTest::test_show_deve_retornar_erro_404_para_cliente_inexistente
     public function test_show_deve_retornar_erro_404_para_cliente_inexistente(): void
     {
         // Act
@@ -73,7 +73,7 @@ class ClienteControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    # php artisan test --filter=ClienteControllerTest::test_show_deve_listar_cliente_com_sucesso
+    # php artisan test --filter=ClientControllerTest::test_show_deve_listar_cliente_com_sucesso
     public function test_show_deve_listar_cliente_com_sucesso(): void
     {
         //Arrange
@@ -109,7 +109,7 @@ class ClienteControllerTest extends TestCase
         $response->assertJsonPath('data.id', $this->client->id);
     }
 
-    # php artisan test --filter=ClienteControllerTest::test_store_deve_retornar_erro_403_se_nao_autorizado
+    # php artisan test --filter=ClientControllerTest::test_store_deve_retornar_erro_403_se_nao_autorizado
     public function test_store_deve_retornar_erro_403_se_nao_autorizado(): void
     {
         //Arrange
@@ -123,7 +123,7 @@ class ClienteControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-    # php artisan test --filter=ClienteControllerTest::test_store_deve_retornar_erro_422_com_dados_invalidos
+    # php artisan test --filter=ClientControllerTest::test_store_deve_retornar_erro_422_com_dados_invalidos
     public function test_store_deve_retornar_erro_422_com_dados_invalidos(): void
     {
         //Arrange
@@ -144,7 +144,7 @@ class ClienteControllerTest extends TestCase
         $response->assertJsonValidationErrors(['name']);
     }
 
-    #php artisan test --filter=ClienteControllerTest::test_store_deve_criar_cliente_com_endereco_com_sucesso
+    #php artisan test --filter=ClientControllerTest::test_store_deve_criar_cliente_com_endereco_com_sucesso
     public function test_store_deve_criar_cliente_com_endereco_com_sucesso(): void
     {
         //Arrange
@@ -170,7 +170,7 @@ class ClienteControllerTest extends TestCase
 
     }
 
-    # php artisan test --filter=ClienteControllerTest::test_update_deve_retornar_erro_403_se_nao_autorizado
+    # php artisan test --filter=ClientControllerTest::test_update_deve_retornar_erro_403_se_nao_autorizado
     public function test_update_deve_retornar_erro_403_se_nao_autorizado(): void
     {
         //Arrange
@@ -184,7 +184,7 @@ class ClienteControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-    # php artisan test --filter=ClienteControllerTest::test_update_deve_retornar_erro_404_para_cliente_inexistente
+    # php artisan test --filter=ClientControllerTest::test_update_deve_retornar_erro_404_para_cliente_inexistente
     public function test_update_deve_retornar_erro_404_para_cliente_inexistente(): void
     {
         //Arrange
@@ -199,7 +199,7 @@ class ClienteControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    # php artisan test --filter=ClienteControllerTest::test_update_deve_atualizar_cliente_com_sucesso
+    # php artisan test --filter=ClientControllerTest::test_update_deve_atualizar_cliente_com_sucesso
     public function test_update_deve_atualizar_cliente_com_sucesso(): void
     {
         //Arrange
