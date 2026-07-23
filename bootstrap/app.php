@@ -22,19 +22,32 @@ $app = Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (HttpException $e, $request) {
+        $exceptions->render(function (\Throwable $e, $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                $errorDetails = [];
 
-            $errorDetails = [];
+                if (config('app.debug')) {
+                    $errorDetails['original_error'] = $e->getMessage();
+                    $errorDetails['trace'] = $e->getTrace();
+                }
 
-            if (config('app.debug')) {
-                $errorDetails['original_error'] = $e->getMessage();
+                $statusCode = 500;
+                if ($e instanceof HttpException) {
+                    $statusCode = $e->getStatusCode();
+                } elseif ($e instanceof \Illuminate\Validation\ValidationException) {
+                    $statusCode = $e->status;
+                    $errorDetails['validation'] = $e->errors();
+                } elseif ($e instanceof \DomainException || $e instanceof \InvalidArgumentException) {
+                    $statusCode = 400;
+                }
+
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage() ?: 'Ocorreu um erro ao processar sua solicitação.',
+                    'errors'  => $errorDetails
+                ], $statusCode);
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Ocorreu um erro ao processar sua solicitação. ',
-                'errors'  => $errorDetails
-            ], $e->getStatusCode());
         });
     })->create();
 
