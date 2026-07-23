@@ -11,7 +11,9 @@ use Exception;
 
 class SaleService
 {
-public function store(array $data)
+    public function __construct(protected PaymentService $paymentService) {}
+
+    public function store(array $data)
     {
         return DB::transaction(function () use ($data) {
 
@@ -42,7 +44,7 @@ public function store(array $data)
 
             $sale->products()->sync($pivotData);
 
-            Payment::syncPayments($sale, $data['payments'] ?? []);
+            $this->paymentService->syncPayments($sale, $data['payments'] ?? []);
 
             $sale->load('products', 'payments');
 

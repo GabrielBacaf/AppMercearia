@@ -22,27 +22,11 @@ class PurchaseController extends Controller
     {
         $this->authorize(PurchasePermissionEnum::INDEX->value);
 
-        $query = Purchase::query();
-        
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('status', 'like', "%{$search}%");
-            });
-        }
-        if ($request->filled('date_start')) {
-            $query->whereDate('created_at', '>=', $request->input('date_start'));
-        }
-        if ($request->filled('date_end')) {
-            $query->whereDate('created_at', '<=', $request->input('date_end'));
-        }
-
-        $purchase = $query->latest()->paginate(5);
+        $purchases = Purchase::with('payments')->paginate(5);
         return $this->successResponseCollection(
-            PurchaseResource::collection($purchase->load('payments')),
-            $purchase,
-            "Compras listados com sucesso!",
+            PurchaseResource::collection($purchases),
+            $purchases,
+            "Compras listadas com sucesso!",
             200
         );
     }
@@ -51,20 +35,15 @@ class PurchaseController extends Controller
     {
         $this->authorize(PurchasePermissionEnum::STORE->value);
 
-        try {
+        $purchase = $this->purchaseService->storePurchase(
+            $request->validated()
+        );
 
-            $purchase = $this->purchaseService->storePurchase(
-                $request->validated()
-            );
-
-            return $this->successResponse(
-                new PurchaseResource($purchase->load('payments')),
-                "Compra e pagamento inicial registrados com sucesso!",
-                201
-            );
-        } catch (Exception $e) {
-            return $this->errorResponse('Ocorreu um erro ao registrar a compra.', (array)$e->getMessage(), 500);
-        }
+        return $this->successResponse(
+            new PurchaseResource($purchase->load('payments')),
+            "Compra e pagamento inicial registrados com sucesso!",
+            201
+        );
     }
 
     public function show(Purchase $purchase)
@@ -83,21 +62,16 @@ class PurchaseController extends Controller
     {
         $this->authorize(PurchasePermissionEnum::UPDATE->value);
 
-        try {
+        $purchase = $this->purchaseService->updatePurchase(
+            $request->validated(),
+            $purchase
+        );
 
-            $purchase = $this->purchaseService->updatePurchase(
-                $request->validated(),
-                $purchase
-            );
-
-            return $this->successResponse(
-                new PurchaseResource($purchase->load('payments')),
-                "Compra e pagamento inicial atualizados com sucesso!",
-                200
-            );
-        } catch (Exception $e) {
-            return $this->errorResponse('Ocorreu um erro ao atualizar a compra.', (array)$e->getMessage(), 500);
-        }
+        return $this->successResponse(
+            new PurchaseResource($purchase->load('payments')),
+            "Compra e pagamento inicial atualizados com sucesso!",
+            200
+        );
     }
 
 
@@ -105,29 +79,11 @@ class PurchaseController extends Controller
     {
         $this->authorize(PurchasePermissionEnum::DESTROY->value);
 
-        if ($purchase->products()->exists()) {
-            return $this->errorResponse('A compra possui vinculo com produtos', [], 500);
+        if ($purchase->products()->count() === 0) {
+            $purchase->delete();
+            return $this->successResponse([], 'Compra deletada com sucesso!', 200);
         }
 
-        $purchase->delete();
-        return $this->successResponse([], 'Compra deletada com sucesso!', 200);
-    }
-
-    public function removeProduct(Purchase $purchase, Product $product)
-    {
-        $this->authorize(PurchasePermissionEnum::UPDATE->value); // Assuming update permission is enough
-
-        try {
-            $purchase->products()->detach($product->id);
-            $purchase->updateStatus();
-
-            return $this->successResponse(
-                new PurchaseResource($purchase->load('payments', 'products')),
-                'Produto desvinculado da compra com sucesso!',
-                200
-            );
-        } catch (Exception $e) {
-            return $this->errorResponse('Ocorreu um erro ao desvincular o produto.', (array)$e->getMessage(), 500);
-        }
+        return $this->errorResponse('A compra possui vínculo com produtos', [], 400);
     }
 }

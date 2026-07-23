@@ -2,13 +2,15 @@
 
 namespace App\Http\Services;
 
-use App\Models\Document;
-use App\Models\Payment;
 use App\Models\Purchase;
 use Illuminate\Support\Facades\DB;
 
 class PurchaseService
 {
+    public function __construct(
+        protected PaymentService $paymentService,
+        protected DocumentService $documentService
+    ) {}
 
     public function storePurchase(array $data): Purchase
     {
@@ -16,8 +18,8 @@ class PurchaseService
 
             $purchase = Purchase::create($data);
 
-            Payment::syncPayments($purchase, $data['payments'] ?? []);
-            Document::syncDocuments($purchase, $data['documents'] ?? []);
+            $this->paymentService->syncPayments($purchase, $data['payments'] ?? []);
+            $this->documentService->syncDocuments($purchase, $data['documents'] ?? []);
 
             return $purchase;
         });
@@ -30,8 +32,8 @@ class PurchaseService
 
             $purchase->update($data);
 
-            Payment::syncPayments($purchase, $data['payments'] ?? []);
-            Document::syncDocuments($purchase, $data['documents'] ?? []);
+            $this->paymentService->syncPayments($purchase, $data['payments'] ?? []);
+            $this->documentService->syncDocuments($purchase, $data['documents'] ?? []);
 
             $purchase->updateStatus();
 

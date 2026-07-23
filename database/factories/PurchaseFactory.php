@@ -16,7 +16,7 @@ class PurchaseFactory extends Factory
     {
         return [
             'title' => $this->faker->sentence(3),
-            'description' => $this->faker->paragraph(),
+            'description' => $this->faker->text(255),
             'purchase_date' => $this->faker->date(),
             'status' => $this->faker->randomElement(StatusEnum::values()),
             'count_value' => null,
