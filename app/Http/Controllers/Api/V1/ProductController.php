@@ -34,17 +34,13 @@ class ProductController extends Controller
     {
         $this->authorize(ProductPermissionEnum::STORE->value);
 
-        try {
-            $product = $this->productService->storeProduct($request->validated());
+        $product = $this->productService->storeProduct($request->validated());
 
-            return $this->successResponse(
-                new ProductResource($product),
-                'Produto criado com sucesso!',
-                201
-            );
-        } catch (Exception $e) {
-            return $this->errorResponse('Ocorreu um erro ao criar o produto.', (array) $e->getMessage(), 500);
-        }
+        return $this->successResponse(
+            new ProductResource($product),
+            'Produto criado com sucesso!',
+            201
+        );
     }
 
     public function show(Product $product)
@@ -62,40 +58,25 @@ class ProductController extends Controller
     {
         $this->authorize(ProductPermissionEnum::UPDATE->value);
 
-        try {
-            $product = $this->productService->updateProduct($request->validated(), $product);
+        $product = $this->productService->updateProduct($request->validated(), $product);
 
-            return $this->successResponse(
-                new ProductResource($product),
-                'Produto atualizado com sucesso!',
-                200
-            );
-        } catch (Exception $e) {
-            return $this->errorResponse('Ocorreu um erro ao atualizar o produto.', (array) $e->getMessage(), 500);
-        }
+        return $this->successResponse(
+            new ProductResource($product),
+            'Produto atualizado com sucesso!',
+            200
+        );
     }
 
     public function destroy(Product $product)
     {
         $this->authorize(ProductPermissionEnum::DESTROY->value);
 
-        try {
+        $product->delete();
 
-            $product->delete();
-
-            return $this->successResponse(
-                null,
-                'Produto excluído com sucesso!',
-                200
-            );
-        } catch (Exception $e) {
-            Log::error('Erro ao excluir produto', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'product_id' => $product->id,
-            ]);
-
-            return $this->errorResponse('Erro ao excluir produto.', [], 500);
-        }
+        return $this->successResponse(
+            null,
+            'Produto excluído com sucesso!',
+            200
+        );
     }
 }

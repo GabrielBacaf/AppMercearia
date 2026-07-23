@@ -28,22 +28,12 @@ class SaleController extends Controller
     {
         $this->authorize(SalePermissionEnum::STORE->value);
 
-        try {
+        $sale = $this->service->store($request->validated());
 
-            $sale = $this->service->store($request->validated());
-
-            return $this->successResponse(
-                new SaleResource($sale),
-                "Venda criada com sucesso!",
-                201
-            );
-        } catch (\Exception $e) {
-
-            return $this->errorResponse(
-                $e->getMessage(),
-                [],
-                400
-            );
-        }
+        return $this->successResponse(
+            new SaleResource($sale),
+            "Venda criada com sucesso!",
+            201
+        );
     }
 }

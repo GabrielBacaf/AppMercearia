@@ -57,11 +57,11 @@ class Product extends Model
             $product = $lockedProducts->get($id);
 
             if (!$product) {
-                throw new \Exception("Produto ID {$id} não encontrado no sistema.");
+                throw new \DomainException("Produto ID {$id} não encontrado no sistema.");
             }
 
             if ($product->stock_quantity < $quantityToDeduct) {
-                throw new \Exception("Estoque insuficiente para o produto: {$product->name}");
+                throw new \DomainException("Estoque insuficiente para o produto: {$product->name}");
             }
 
             $product->stock_quantity -= $quantityToDeduct;
