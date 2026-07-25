@@ -15,23 +15,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
 
-    Route::post('login', [AuthController::class, 'login'])->name('login');
+    // Rota de login para Super Admin
+    Route::post('admin/login', [AuthController::class, 'login'])->name('central.login');
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::post('admin/logout', [AuthController::class, 'logout'])->name('central.logout');
 
-        Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-        
-        Route::get('enums', [EnumController::class, 'index'])->name('enums.index');
-
-        Route::apiResource('users', UserController::class);
-        Route::apiResource('roles', RoleController::class)->except('destroy');
-        Route::apiResource('products', ProductController::class);
-        Route::get('permissions', [PermissionController::class, 'index'])->name('permissions.index');
-        Route::apiResource('purchases', PurchaseController::class);
-        Route::delete('purchases/{purchase}/products/{product}', [PurchaseController::class, 'removeProduct'])->name('purchases.products.destroy');
-        Route::apiResource('suppliers', SupplierController::class)->except('destroy');
-        Route::post('clients/extract-location', [ClientController::class, 'extractLocation'])->name('clients.extract-location');
-        Route::apiResource('clients', ClientController::class)->except('destroy');
-        Route::apiResource('sales', SaleController::class);
+        // Gerenciamento de Tenants (Lojas) pelo Super Admin
+        Route::apiResource('tenants', \App\Http\Controllers\Api\V1\Central\CentralTenantController::class);
     });
 });

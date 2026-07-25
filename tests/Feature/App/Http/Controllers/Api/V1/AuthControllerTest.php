@@ -12,7 +12,7 @@ class AuthControllerTest extends TestCase
     public function test_logando_com_sucesso()
     {
         //Act
-        $response = $this->postJson(route('login'), [
+        $response = $this->postJson(route('tenant.login'), [
             'login' => $this->user->login,
             'password' => '12345678',
             'device_name' => 'testing'
@@ -43,7 +43,7 @@ class AuthControllerTest extends TestCase
     {
         //Act
         $response = $this->withHeader('Authorization', "Bearer $this->token")
-            ->postJson(route('logout'));
+            ->postJson(route('tenant.logout'));
 
         //Assert
         $response->assertStatus(200);

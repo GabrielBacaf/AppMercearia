@@ -14,8 +14,6 @@ use Tests\TestCase;
 # php artisan test --filter=SaleControllerTest
 class SaleControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
     private Product $product1;
     private Product $product2;
 

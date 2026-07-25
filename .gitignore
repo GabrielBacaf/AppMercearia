@@ -9,6 +9,8 @@
 /.idea
 /.nova
 /.phpunit.cache
+/cacert.pem
+/custom-php.ini
 /.vscode
 /.zed
 /auth.json
