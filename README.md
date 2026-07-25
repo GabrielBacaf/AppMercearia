@@ -8,13 +8,13 @@
 
 <br>
 
-# 🛒 AppMercearia API
+# 🛒 AppMercearia ERP (Multi-Tenant)
 
-> **O que faz:** Uma API RESTful robusta desenvolvida para gerenciar as operações diárias de uma mercearia (estoque, clientes, compras e permissões).
+> **O que faz:** Um ERP (Enterprise Resource Planning) SaaS completo e Multi-Tenant, desenvolvido para automatizar e gerenciar as operações diárias de múltiplas Mercearias e Distribuidoras. Cada empresa (loja/distribuidora) possui seu banco de dados totalmente isolado.
 > 
-> **Com o que foi construído:** Desenvolvido com Laravel 12, PHP 8.2 e MySQL 8.4, rodando em um ambiente 100% isolado com Docker (Laravel Sail).
+> **Com o que foi construído:** Desenvolvido com Laravel 12, PHP 8.2 e MySQL 8.4, arquitetura de banco de dados por inquilino (`stancl/tenancy`), rodando em um ambiente isolado com Docker (Laravel Sail).
 > 
-> **Por que foi construído:** Este projeto nasceu como um objeto prático de estudo focado no ecossistema Laravel. O objetivo principal é dominar a criação e documentação de uma API RESTful do zero, aplicando conceitos avançados de arquitetura e segurança, com o propósito real de implementar o sistema para modernizar e automatizar a gestão da mercearia da família.
+> **Por que foi construído:** Este projeto foca em dominar a criação de um SaaS B2B moderno. A arquitetura Multi-Tenant garante a segurança e privacidade dos dados, fundamental para um sistema de gestão robusto que será utilizado por diversas distribuidoras e pequenos mercados.
 
 ---
 
@@ -58,47 +58,154 @@ cp .env.example .env
 
 ---
 
-## 📖 Instruções de Uso
+## 🏢 Gestão de Múltiplas Lojas (Multi-Tenant)
 
-A API está disponível em `http://localhost`. Todas as requisições (exceto login) exigem um token Bearer retornado pelo Sanctum.
+O sistema utiliza a abordagem "Database per Tenant" (um banco de dados exclusivo para cada empresa cadastrada). 
+Isso significa que existem **duas rotas principais** de acesso:
+1. **Central SaaS (`/api/v1/tenants`):** Acessada apenas pelo Administrador Global do sistema para cadastrar novas empresas/mercearias.
+2. **Empresas/Lojas (`http://nomedaloja.localhost/...`):** Acessada pelos donos das mercearias para operar seu negócio diário. O banco de dados muda dinamicamente baseado no subdomínio.
 
-**Exemplo de Endpoint de Produtos (GET `/api/v1/products`)**
+### Como criar uma nova Distribuidora/Mercearia via Tinker:
+Para simular a criação de uma nova loja pelo terminal (ou testar o comportamento SaaS):
+```bash
+php artisan tinker
+```
+```php
+// 1. Cria a loja e o subdomínio
+$tenant = App\Models\Tenant::create(['id' => 'minhadistribuidora']);
+$tenant->domains()->create(['domain' => 'minhadistribuidora.localhost']);
 
-*Request:*
-```http
-GET /api/v1/products HTTP/1.1
-Host: localhost
-Accept: application/json
-Authorization: Bearer {seu_token_aqui}
+// 2. Entra no banco de dados exclusivo da loja e cria o usuário Admin dela
+$tenant->run(function () {
+    $role = Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'api']);
+    $user = App\Models\User::create([
+        'name' => 'Dono da Distribuidora',
+        'login' => 'adminloja',
+        'email' => 'admin@distribuidora.com',
+        'password' => Hash::make('12345678')
+    ]);
+    $user->assignRole($role);
+});
 ```
 
-*Response:*
+---
+
+## 📖 Instruções de Uso da API
+
+A API está disponível em `http://localhost:8000` (Central) e nos **subdomínios das lojas** (ex: `http://minhadistribuidora.localhost:8000`). Todas as rotas de operação (produtos, vendas) DEVEM ser acessadas pelo domínio da loja.
+
+Recomendamos o uso do **Postman** para testar as rotas.
+
+### 🔐 1. Autenticação (Login na Loja)
+**POST** `http://minhadistribuidora.localhost:8000/api/v1/login`
 ```json
 {
-  "data": [
+  "login": "adminloja",
+  "password": "12345678",
+  "device_name": "postman"
+}
+```
+*Copie o `access_token` retornado e use na aba "Authorization -> Bearer Token" nas próximas requisições.*
+
+### 👥 2. Criar Usuário e Perfil
+**POST** `http://minhadistribuidora.localhost:8000/api/v1/roles` (Criar Perfil)
+```json
+{
+  "name": "gerente",
+  "permissions": [1, 2, 3] 
+}
+```
+*(Faça um GET em `/api/v1/permissions` para ver os IDs disponíveis)*
+
+**POST** `http://minhadistribuidora.localhost:8000/api/v1/users` (Criar Usuário)
+```json
+{
+  "name": "João Silva",
+  "login": "joaosilva",
+  "email": "joao@example.com",
+  "password": "password123",
+  "password_confirmation": "password123",
+  "roles": ["gerente"]
+}
+```
+
+### 🛒 3. Registrar Compra (Entrada de Estoque)
+**POST** `http://minhadistribuidora.localhost:8000/api/v1/purchases`
+```json
+{
+  "title": "Compra de Bebidas",
+  "purchase_date": "2023-11-20",
+  "supplier_id": 1, 
+  "payments": [
     {
-      "id": 1,
-      "name": "Arroz 5kg",
-      "price": 25.90,
-      "stock_quantity": 50,
-      "supplier_id": 3
+      "payment_type": "Pix Empresa", 
+      "payment_status": "Pago", 
+      "value": 150.50
     }
   ]
 }
 ```
 
-> **Dica:** Para testar a aplicação de forma visual, recomendamos a utilização do **Postman** ou importar a coleção na nossa documentação interativa do Swagger.
+### 📦 4. Cadastrar Produto
+**POST** `http://minhadistribuidora.localhost:8000/api/v1/products`
+```json
+{
+  "barcode": "7891010101015",
+  "name": "Coca-Cola 2L",
+  "sale_value": 10.50,
+  "category": "Bebidas", 
+  "amount": 24, 
+  "purchase_id": 1, 
+  "purchase_value": 7.50 
+}
+```
+
+### 💵 5. Registrar Venda (Saída)
+**POST** `http://minhadistribuidora.localhost:8000/api/v1/sales`
+```json
+{
+  "discount": 0,
+  "delivery_price": 0,
+  "products": [
+    {
+      "id": 1, 
+      "quantity": 2
+    }
+  ],
+  "payments": [
+    {
+      "payment_type": "Dinheiro",
+      "payment_status": "Pago",
+      "value": 21.00
+    }
+  ]
+}
+```
+
+> **Rotas de Leitura:** Para listar dados (como `GET http://minhadistribuidora.localhost:8000/api/v1/products`), não é necessário enviar JSON Body. Apenas coloque a URL e certifique-se de enviar o Token de Autorização.
 
 ---
 
-## 🧪 Testes Automatizados
+## 🧪 Testes Automatizados e Multi-Tenancy
 
-Para garantir que novas implementações não quebrem as regras de negócio do estoque ou clientes, execute a suíte de testes do PHPUnit:
+O sistema possui uma suíte completa de testes automatizados de Integração e Unidade (mais de 60 testes), que validam a lógica de negócios, controle de acesso e concorrência no ambiente Multi-Tenant.
+
+**Arquitetura de Testes Multi-Tenant:**
+Para garantir que os testes rodem rapidamente e sem conflitos:
+- O banco de dados central (`testing.sqlite`) é recriado a cada teste.
+- Um tenant (e seu banco de dados exclusivo de testes) é criado dinamicamente no `setUp()` e limpo no `tearDown()` para simular as transações de cada loja isoladamente sem conflito de chaves estrangeiras.
+- As permissões e roles são injetadas de forma encapsulada por teste.
+
+Para executar a suíte localmente com sucesso:
 
 ```bash
+# Rode usando o Laravel Sail
 ./vendor/bin/sail artisan test
+
+# Ou diretamente no seu ambiente local (requer banco configurado em database/testing.sqlite)
+php artisan test
 ```
-*O repositório possui integração contínua (GitHub Actions) que executa os testes automaticamente a cada Pull Request.*
+*A suíte de testes passou por uma grande refatoração e garante a confiabilidade do isolamento das lojas.*
 
 ---
 
