@@ -1,10 +1,10 @@
 # ADR: Endpoints e Payload do Modelo Purchase
 
 ## Status
-Aceito
+Aceito (Atualizado pós Módulo Financeiro)
 
 ## Contexto
-O modelo **Purchase** gerencia o registro das compras feitas de fornecedores e a entrada de produtos no estoque, incluindo pagamentos e notas fiscais (documentos).
+O modelo **Purchase** gerencia o registro das compras feitas de fornecedores e a entrada de produtos no estoque, incluindo anexos de notas fiscais. O fluxo financeiro (parcelamento) agora é delegado ao `AccountPayable`.
 
 ## Decisão
 
@@ -17,53 +17,30 @@ Base URL: `/api/v1/purchases` (Autenticado via Sanctum)
 - **DELETE** `/api/v1/purchases/{id}` - Remover uma compra.
 
 ### Payload Esperado para Cadastro (FormData / JSON)
-Como suporte a envio de arquivos, para enviar `document_files` o frontend geralmente usará `multipart/form-data`.
+Para enviar arquivos (document_files), usar `multipart/form-data`.
 ```json
 {
-  "title": "Compra Mensal",             // Obrigatório, String, max 50
-  "description": "Detalhes da compra",  // Opcional, String, max 255
-  "purchase_date": "2024-05-10",        // Obrigatório, Data, menor ou igual a hoje
-  "supplier_id": 1,                     // Opcional, Inteiro (ID de Supplier)
-  "invoice_id": 1,                      // Opcional, Inteiro (ID de Invoice)
+  "title": "Compra Mensal",             
+  "description": "Detalhes da compra",  
+  "purchase_date": "2026-07-25",        
+  "supplier_id": 1,                     
+  "invoice_id": 1,                      
   
-  // "status", "count_value", "user_id", "updated_by" são PROIBIDOS de enviar.
+  "installments": 3,                    // Opcional, Default 1. Em quantas vezes a compra será dividida (gera Contas a Pagar)
   
-  "payments": [                         // Obrigatório, Array, mín 1 item
+  "payments": [                         // Opcional. Útil se a compra teve uma ENTRADA ou foi PAGA A VISTA.
     {
-      "payment_type": "BOLETO",         // Obrigatório, Enum
-      "payment_status": "PENDING",      // Obrigatório, Enum
-      "value": 1500.00                  // Obrigatório, Numérico, min 0.01
+      "payment_type": "BOLETO",         
+      "payment_status": "PAID",      
+      "value": 500.00                  
     }
   ],
   
-  // Envio de Documentos (Opcional - via multipart/form-data idealmente)
-  "document_files[]": [ /* Arquivos PDF, max 5MB cada */ ],
-  "document_labels[]": [ "Nota Fiscal 1", "Comprovante" ] // O tamanho deve bater com os arquivos
+  "document_files[]": [ /* Arquivos PDF */ ],
+  "document_labels[]": [ "Nota Fiscal 1" ]
 }
 ```
 
-### Formato de Retorno da API (Resource JSON)
-```json
-{
-  "data": {
-    "id": 1,
-    "title": "Compra Mensal",
-    "description": "Detalhes da compra",
-    "supplier_id": 1,
-    "invoice_id": null,
-    "purchase_date": "2024-05-10",
-    "count_value": 1500.00,
-    "status": "APPROVED",
-    "user_id": 1,
-    "payments": [
-      {
-        "id": 1,
-        "value": 1500.00,
-        "payment_status": "PENDING",
-        "payable_id": 1,
-        "payment_type": "BOLETO"
-      }
-    ]
-  }
-}
-```
+### Observações sobre Pagamentos e Parcelas
+- **100% A Prazo:** Se você não enviar o array `payments`, o sistema gera as X parcelas pendentes e a compra fica aguardando pagamento futuro (via endpoints de `payables`).
+- **Com Entrada:** Se enviar pagamentos, eles quitarão a **primeira** parcela gerada na hora.

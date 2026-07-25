@@ -11,38 +11,61 @@ class CheckOverdueAccountsCommand extends Command
 
     public function handle()
     {
-        $yesterday = \Carbon\Carbon::yesterday()->format('Y-m-d');
-
-        $pendingPayables = \App\Models\AccountPayable::whereIn('status', [
-                \App\Enums\FinancialStatusEnum::PENDING->value,
-                \App\Enums\FinancialStatusEnum::PARTIALLY_PAID->value
-            ])
-            ->whereDate('due_date', '<=', $yesterday)
-            ->get();
-
-        foreach ($pendingPayables as $payable) {
-            $payable->update(['status' => \App\Enums\FinancialStatusEnum::OVERDUE->value]);
-            
-            // Notify the super admin or store owner via user 1 (assuming tenant owner)
-            $admin = \App\Models\User::first();
-            if ($admin) {
-                $admin->notify(new \App\Notifications\PaymentOverdueNotification($payable));
-            }
+        $admin = \App\Models\User::first();
+        if (!$admin) {
+            return;
         }
 
-        $pendingReceivables = \App\Models\AccountReceivable::whereIn('status', [
+        $this->processAccounts(
+            \App\Models\AccountPayable::query(),
+            $admin,
+            [
+                'tomorrow' => \App\Notifications\PaymentDueTomorrowNotification::class,
+                'today'    => \App\Notifications\PaymentDueTodayNotification::class,
+                'overdue'  => \App\Notifications\PaymentOverdueNotification::class,
+            ]
+        );
+
+        $this->processAccounts(
+            \App\Models\AccountReceivable::query(),
+            $admin,
+            [
+                'tomorrow' => \App\Notifications\ReceivableDueTomorrowNotification::class,
+                'today'    => \App\Notifications\ReceivableDueTodayNotification::class,
+                'overdue'  => \App\Notifications\ReceivableOverdueNotification::class,
+            ]
+        );
+    }
+
+    private function processAccounts($query, $admin, array $notifications)
+    {
+        $tomorrow = \Carbon\Carbon::tomorrow()->format('Y-m-d');
+        $today = \Carbon\Carbon::today()->format('Y-m-d');
+        $yesterday = \Carbon\Carbon::yesterday()->format('Y-m-d');
+
+        $accounts = $query->whereIn('status', [
                 \App\Enums\FinancialStatusEnum::PENDING->value,
                 \App\Enums\FinancialStatusEnum::PARTIALLY_PAID->value
             ])
-            ->whereDate('due_date', '<=', $yesterday)
+            ->whereDate('due_date', '<=', $tomorrow)
             ->get();
 
-        foreach ($pendingReceivables as $receivable) {
-            $receivable->update(['status' => \App\Enums\FinancialStatusEnum::OVERDUE->value]);
+        foreach ($accounts as $account) {
+            $dueDate = $account->due_date->format('Y-m-d');
 
-            $admin = \App\Models\User::first();
-            if ($admin) {
-                $admin->notify(new \App\Notifications\ReceivableOverdueNotification($receivable));
+            $type = match (true) {
+                $dueDate === $tomorrow => 'tomorrow',
+                $dueDate === $today => 'today',
+                $dueDate <= $yesterday => 'overdue',
+                default => null,
+            };
+
+            if ($type) {
+                if ($type === 'overdue') {
+                    $account->update(['status' => \App\Enums\FinancialStatusEnum::OVERDUE->value]);
+                }
+
+                $admin->notify(new $notifications[$type]($account));
             }
         }
     }
