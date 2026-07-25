@@ -26,10 +26,9 @@ class Sale extends Model
         return $this->belongsTo(Client::class);
     }
 
-   public function payments()
+   public function accountsReceivable()
     {
-    
-        return $this->morphMany(Payment::class, 'payable');
+        return $this->morphMany(AccountReceivable::class, 'receivable');
     }
 
     public function products()

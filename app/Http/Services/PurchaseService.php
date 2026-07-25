@@ -9,7 +9,8 @@ class PurchaseService
 {
     public function __construct(
         protected PaymentService $paymentService,
-        protected DocumentService $documentService
+        protected DocumentService $documentService,
+        protected AccountPayableService $payableService
     ) {}
 
     public function storePurchase(array $data): Purchase
@@ -18,13 +19,25 @@ class PurchaseService
 
             $purchase = Purchase::create($data);
 
-            $this->paymentService->syncPayments($purchase, $data['payments'] ?? []);
+            $installments = $data['installments'] ?? 1;
+            
+            $this->payableService->generateFromPurchase($purchase, $installments);
+
+            $firstPayable = $purchase->accountsPayable()->orderBy('due_date', 'asc')->first();
+
+            if ($firstPayable && !empty($data['payments'])) {
+                foreach ($data['payments'] as $paymentData) {
+                    $this->payableService->settle($firstPayable, $paymentData);
+                }
+            }
+
             $this->documentService->syncDocuments($purchase, $data['documents'] ?? []);
+
+            $purchase->updateStatus();
 
             return $purchase;
         });
     }
-
 
     public function updatePurchase(array $data, Purchase $purchase): Purchase
     {
@@ -32,7 +45,14 @@ class PurchaseService
 
             $purchase->update($data);
 
-            $this->paymentService->syncPayments($purchase, $data['payments'] ?? []);
+            $firstPayable = $purchase->accountsPayable()->orderBy('due_date', 'asc')->first();
+            
+            if ($firstPayable && !empty($data['payments'])) {
+                foreach ($data['payments'] as $paymentData) {
+                    $this->payableService->settle($firstPayable, $paymentData);
+                }
+            }
+
             $this->documentService->syncDocuments($purchase, $data['documents'] ?? []);
 
             $purchase->updateStatus();
