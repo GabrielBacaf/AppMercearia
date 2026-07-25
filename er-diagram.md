@@ -1,5 +1,31 @@
 ```mermaid
 erDiagram
+    accounts_payable {
+        bigint_unsigned id PK
+        varchar(255) title
+        decimal(10_2) amount
+        date due_date
+        date paid_date "nullable"
+        varchar(255) status
+        varchar(255) type
+        varchar(255) payable_type "nullable"
+        bigint_unsigned payable_id "nullable"
+        timestamp created_at "nullable"
+        timestamp updated_at "nullable"
+    }
+    accounts_receivable {
+        bigint_unsigned id PK
+        varchar(255) title
+        decimal(10_2) amount
+        date due_date
+        date received_date "nullable"
+        varchar(255) status
+        bigint_unsigned client_id "nullable"
+        varchar(255) receivable_type "nullable"
+        bigint_unsigned receivable_id "nullable"
+        timestamp created_at "nullable"
+        timestamp updated_at "nullable"
+    }
     addresses {
         bigint_unsigned id PK
         varchar(255) street "nullable"
@@ -13,6 +39,16 @@ erDiagram
         decimal(11_8) longitude "nullable"
         timestamp created_at "nullable"
         timestamp updated_at "nullable"
+    }
+    cache {
+        varchar(255) key PK
+        mediumtext value
+        int expiration
+    }
+    cache_locks {
+        varchar(255) key PK
+        varchar(255) owner
+        int expiration
     }
     categories {
         bigint_unsigned id PK
@@ -41,10 +77,57 @@ erDiagram
         timestamp created_at "nullable"
         timestamp updated_at "nullable"
     }
+    domains {
+        int_unsigned id PK
+        varchar(255) domain UK
+        varchar(255) tenant_id
+        timestamp created_at "nullable"
+        timestamp updated_at "nullable"
+    }
+    failed_jobs {
+        bigint_unsigned id PK
+        varchar(255) uuid UK
+        text connection
+        text queue
+        longtext payload
+        longtext exception
+        timestamp failed_at
+    }
+    job_batches {
+        varchar(255) id PK
+        varchar(255) name
+        int total_jobs
+        int pending_jobs
+        int failed_jobs
+        longtext failed_job_ids
+        mediumtext options "nullable"
+        int cancelled_at "nullable"
+        int created_at
+        int finished_at "nullable"
+    }
+    jobs {
+        bigint_unsigned id PK
+        varchar(255) queue
+        longtext payload
+        tinyint_unsigned attempts
+        int_unsigned reserved_at "nullable"
+        int_unsigned available_at
+        int_unsigned created_at
+    }
     migrations {
         int_unsigned id PK
         varchar(255) migration
         int batch
+    }
+    notifications {
+        char(36) id PK
+        varchar(255) type
+        varchar(255) notifiable_type
+        bigint_unsigned notifiable_id
+        text data
+        timestamp read_at "nullable"
+        timestamp created_at "nullable"
+        timestamp updated_at "nullable"
     }
     model_has_permissions {
         bigint_unsigned permission_id PK
@@ -171,6 +254,29 @@ erDiagram
         timestamp created_at "nullable"
         timestamp updated_at "nullable"
     }
+    telescope_entries {
+        bigint_unsigned sequence PK
+        char(36) uuid UK
+        char(36) batch_id
+        varchar(255) family_hash "nullable"
+        tinyint(1) should_display_on_index
+        varchar(20) type
+        longtext content
+        datetime created_at "nullable"
+    }
+    telescope_entries_tags {
+        char(36) entry_uuid PK
+        varchar(255) tag PK
+    }
+    telescope_monitoring {
+        varchar(255) tag PK
+    }
+    tenants {
+        varchar(255) id PK
+        timestamp created_at "nullable"
+        timestamp updated_at "nullable"
+        json data "nullable"
+    }
     users {
         bigint_unsigned id PK
         varchar(255) name
@@ -184,12 +290,16 @@ erDiagram
         timestamp updated_at "nullable"
     }
     addresses ||--o{ clients : "uses"
+    clients ||--o{ accounts_receivable : "uses"
+    tenants ||--o{ domains : "uses"
     permissions ||--o{ model_has_permissions : "uses"
     roles ||--o{ model_has_roles : "uses"
     products ||--o{ product_purchase : "uses"
     purchases ||--o{ product_purchase : "uses"
     products ||--o{ product_sale : "uses"
     sales ||--o{ product_sale : "uses"
+    purchases ||--o{ accounts_payable : "uses"
+    sales ||--o{ accounts_receivable : "uses"
     categories ||--o{ products : "uses"
     suppliers ||--o{ purchases : "uses"
     users ||--o{ purchases : "uses"
@@ -199,4 +309,5 @@ erDiagram
     clients ||--o{ sales : "uses"
     users ||--o{ sales : "uses"
     users ||--o{ sales : "uses"
+    telescope_entries ||--o{ telescope_entries_tags : "uses"
 ```

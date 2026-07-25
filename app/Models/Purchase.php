@@ -54,9 +54,9 @@ class Purchase extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function payments(): MorphMany
+    public function accountsPayable(): MorphMany
     {
-        return $this->morphMany(Payment::class, 'payable');
+        return $this->morphMany(AccountPayable::class, 'payable');
     }
 
     public function products(): BelongsToMany
@@ -74,11 +74,14 @@ class Purchase extends Model
             return $pivot->purchase_value * $pivot->amount;
         });
 
-        $totalPaid = $this->payments()->sum('value');
+        $totalPaid = $this->accountsPayable()->with('payments')->get()->pluck('payments')->flatten()->sum('value');
 
         $this->count_value = $totalPaid - $totalCostOfProducts;
 
-        $hasPendingPayments = $this->payments()->where('payment_status', PaymentStatusEnum::DEVENDO->value)->exists();
+        $hasPendingPayments = $this->accountsPayable()->whereIn('status', [
+            \App\Enums\FinancialStatusEnum::PENDING->value,
+            \App\Enums\FinancialStatusEnum::OVERDUE->value
+        ])->exists();
 
         $this->status = PurchaseStatusResolver::resolve($this->count_value, $hasPendingPayments);
 

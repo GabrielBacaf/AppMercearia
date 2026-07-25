@@ -1,10 +1,10 @@
 # ADR: Endpoints e Payload do Modelo Sale
 
 ## Status
-Aceito
+Aceito (Atualizado pós Módulo Financeiro)
 
 ## Contexto
-Para registrar uma venda, o payload é complexo pois engloba produtos e pagamentos. Esta documentação orienta a equipe de front-end em como formatar o JSON de envio e o que esperar de volta da API para o modelo **Sale**.
+Para registrar uma venda, o payload engloba os produtos vendidos. O sistema agora delega automaticamente as parcelas e cobranças a prazo para o módulo `AccountReceivable`.
 
 ## Decisão
 
@@ -17,62 +17,32 @@ Base URL: `/api/v1/sales` (Autenticado via Sanctum)
 - **DELETE** `/api/v1/sales/{id}` - Cancelar/remover venda.
 
 ### Payload Esperado para Cadastro (JSON)
-Campos como `user_id`, `updated_by` e `total_value` são **proibidos** de serem enviados, o backend calcula ou insere via token.
+Campos de sistema como `user_id` e `total_value` não devem ser enviados.
 ```json
 {
-  "discount": 5.0,              // Opcional, Numérico, min 0, max 10
-  "delivery_price": 15.0,       // Opcional, Numérico, min 0
-  "client_id": 2,               // Opcional, Inteiro (ID de Client válido)
+  "discount": 5.0,              // Opcional
+  "delivery_price": 15.0,       // Opcional
+  "client_id": 2,               // Opcional (Obrigatório se a venda for fiado/a prazo longo)
   
-  "products": [                 // Obrigatório, Array, mín 1 item
+  "installments": 2,            // Opcional, Default 1. Divide o total da venda em N Contas a Receber.
+  
+  "products": [                 // Obrigatório
     {
-      "id": 1,                  // Opcional (se não enviar pode dar erro, ideal enviar ID do Product)
-      "quantity": 2             // Obrigatório, Inteiro, min 1
+      "id": 1,                  
+      "quantity": 2             
     }
   ],
   
-  "payments": [                 // Obrigatório, Array, mín 1 item
+  "payments": [                 // Opcional. Útil para pagar a primeira parcela na hora (entrada) ou liquidar venda à vista.
     {
-      "payment_type": "PIX",    // Obrigatório, Enum (PaymentTypeEnum)
-      "payment_status": "PAID", // Obrigatório, Enum (PaymentStatusEnum)
-      "value": 100.50           // Obrigatório, Numérico, min 0.01
+      "payment_type": "PIX",    
+      "payment_status": "PAID", 
+      "value": 100.50           
     }
   ]
 }
 ```
 
-### Formato de Retorno da API (Resource JSON)
-O retorno carrega relacionalmente os produtos e pagamentos.
-```json
-{
-  "data": {
-    "id": 1,
-    "discount": 5.0,
-    "delivery_price": 15.0,
-    "user_id": 1,
-    "updated_by": null,
-    "client_id": 2,
-    "total_value": 100.50,
-    "products": [
-      {
-        "id": 1,
-        "barcode": "1234567890",
-        "name": "Nome do Produto",
-        "expiration_date": "2027-12-31",
-        "current_stock": 8,
-        "quantity_sold": 2,
-        "sale_value": 50.25
-      }
-    ],
-    "payments": [
-      {
-        "id": 1,
-        "value": 100.50,
-        "payment_status": "PAID",
-        "payable_id": 1,
-        "payment_type": "PIX"
-      }
-    ]
-  }
-}
-```
+### Observações de Fluxo
+- Se a venda for 100% fiado, **omita** o array `payments`. O sistema criará as faturas como `PENDING` nas Contas a Receber.
+- Para pagar as faturas pendentes dos meses seguintes, o front-end deve acionar a rota do financeiro (`POST /api/v1/financial/receivables/{id}/settle`).

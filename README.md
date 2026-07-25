@@ -186,6 +186,15 @@ Recomendamos o uso do **Postman** para testar as rotas.
 
 ---
 
+## 📈 Módulo Financeiro (Contas a Pagar e Receber)
+
+O ERP conta com um robusto sistema financeiro nativo:
+- **Contas a Pagar (Accounts Payable):** Compras no fornecedor geram obrigações parceladas dinamicamente.
+- **Contas a Receber (Accounts Receivable):** Vendas corporativas, fiado, e cartões de crédito geram títulos recebíveis.
+- O desacoplamento dos `Payments` (baixas) permite rastrear com precisão o DRE e Fluxo de Caixa, com integração às Notificações nativas do Laravel para evitar inadimplência.
+
+---
+
 ## 🧪 Testes Automatizados e Multi-Tenancy
 
 O sistema possui uma suíte completa de testes automatizados de Integração e Unidade (mais de 60 testes), que validam a lógica de negócios, controle de acesso e concorrência no ambiente Multi-Tenant.

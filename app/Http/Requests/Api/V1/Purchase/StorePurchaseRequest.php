@@ -32,9 +32,10 @@ class StorePurchaseRequest extends FormRequest
             'invoice_id' => ['sometimes', 'integer', 'exists:invoices,id'],
             'user_id' => ['prohibited'],
             'updated_by' => ['prohibited'],
+            'installments' => ['sometimes', 'integer', 'min:1'],
 
             //payments
-            'payments' => ['required', 'array', 'min:1'],
+            'payments' => ['sometimes', 'array'],
             'payments.*.payment_type' => ['required', 'string', Rule::in(PaymentTypeEnum::values())],
             'payments.*.payment_status' => ['required', 'string', Rule::in(PaymentStatusEnum::values())],
             'payments.*.value' => ['required', 'numeric', 'min:0.01'],
