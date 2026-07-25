@@ -20,7 +20,9 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-
-
+        // Concede todas as permissões (bypassa o $this->authorize()) se o usuário for 'admin'
+        \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
+            return $user->hasRole('admin') ? true : null;
+        });
     }
 }
