@@ -13,19 +13,14 @@ use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
-
-    Route::post('login', [AuthController::class, 'login'])->name('login');
+    
+    // Rota de login para Super Admin
+    Route::post('admin/login', [AuthController::class, 'login'])->name('central.login');
 
     Route::middleware('auth:sanctum')->group(function () {
-
-        Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-        Route::apiResource('users', UserController::class);
-        Route::apiResource('roles', RoleController::class)->except('destroy');
-        Route::apiResource('products', ProductController::class);
-        Route::get('permissions', [PermissionController::class, 'index'])->name('permissions.index');
-        Route::apiResource('purchases', PurchaseController::class);
-        Route::apiResource('suppliers', SupplierController::class)->except('destroy');
-        Route::apiResource('clients', ClientController::class)->except('destroy');
-        Route::apiResource('sales', SaleController::class);
+        Route::post('admin/logout', [AuthController::class, 'logout'])->name('central.logout');
+        
+        // Gerenciamento de Tenants (Lojas) pelo Super Admin
+        Route::apiResource('tenants', \App\Http\Controllers\Api\V1\Central\CentralTenantController::class);
     });
 });

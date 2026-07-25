@@ -65,14 +65,14 @@ class RolesAndPermissionsSeeder extends Seeder
 
     private function deleteObsoletePermissions(array $validPermissions): void
     {
-        $this->command->info('Limpando permissões obsoletas...');
+        if ($this->command) $this->command->info('Limpando permissões obsoletas...');
         Permission::whereNotIn('name', $validPermissions)
             ->where('guard_name', $this->defaultGuard)
             ->delete();
     }
     private function createOrUpdatePermissions(array $validPermissions): void
     {
-        $this->command->info('Criando ou atualizando permissões...');
+        if ($this->command) $this->command->info('Criando ou atualizando permissões...');
         foreach ($validPermissions as $permission) {
             Permission::firstOrCreate([
                 'name' => $permission,
