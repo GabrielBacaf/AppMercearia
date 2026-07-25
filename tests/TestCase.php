@@ -43,7 +43,6 @@ abstract class TestCase extends BaseTestCase
 
         if ($this->tenant) {
             $dbPath = database_path('tenant' . $this->tenant->id);
-            $this->tenant->delete();
             if (file_exists($dbPath)) {
                 unlink($dbPath);
             }
