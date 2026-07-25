@@ -20,7 +20,8 @@ class ProductResource extends JsonResource
             'name' => $this->name,
             'expiration_date' => $this->expiration_date,
             'sale_value' => $this->sale_value,
-            'category' => $this->category,
+            'category_id' => $this->category_id,
+            'category' => $this->whenLoaded('category'),
             'stock_quantity' => $this->stock_quantity,
 
         ];

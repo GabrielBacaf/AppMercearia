@@ -70,7 +70,7 @@ class ProductControllerTest extends TestCase
                     'barcode',
                     'name',
                     'expiration_date',
-                    'category',
+                    'category_id',
                     'sale_value',
                     'stock_quantity',
                 ],
@@ -143,7 +143,7 @@ class ProductControllerTest extends TestCase
                 'name',
                 'expiration_date',
                 'sale_value',
-                'category',
+                'category_id',
                 'stock_quantity',
             ]
         ]);
@@ -178,7 +178,7 @@ class ProductControllerTest extends TestCase
             'name' => '',
             'barcode' => '',
             'expiration_date' => 'DSDS',
-            'category' => 'DSS',
+            'category_id' => 9999999, // invalid ID
             'sale_value' => 'DSDS',
             'stock_quantity' => 'SD',
         ];

@@ -35,7 +35,6 @@ class TenantCreationTest extends TestCase
             'admin_password' => 'password123',
         ]);
 
-        $response->dump();
         $response->assertStatus(201)
                  ->assertJsonPath('message', 'Tenant criado com sucesso!')
                  ->assertJsonPath('data.id', 'mercearia-do-joao')
