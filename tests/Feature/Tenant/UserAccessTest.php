@@ -10,8 +10,6 @@ use Spatie\Permission\Models\Role;
 
 class UserAccessTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected bool $initializeTenancy = false;
 
     public function test_tenant_user_can_access_tenant_routes()

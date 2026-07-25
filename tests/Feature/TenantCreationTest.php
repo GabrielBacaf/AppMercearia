@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 class TenantCreationTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected bool $initializeTenancy = false;
 
     public function setUp(): void

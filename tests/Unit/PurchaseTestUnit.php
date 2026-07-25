@@ -9,14 +9,11 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 # php artisan test --filter=PurchaseTest
 class PurchaseTestUnit extends TestCase
 {
-    use RefreshDatabase;
-
     private Purchase $purchase;
 
     private User $user;
