@@ -111,45 +111,41 @@ class FinancialDashboardTest extends TestCase
         ]);
         
         // Simular uma compra para definir o custo real dos produtos
-        $supplierId = \Illuminate\Support\Facades\DB::table('suppliers')->insertGetId([
+        $supplier = \App\Models\Supplier::create([
             'fantasy_name' => 'Fornecedor Teste',
             'legal_name' => 'Fornecedor Teste LTDA',
             'cnpj' => '00000000000000',
-            'created_at' => $now,
-            'updated_at' => $now,
         ]);
         
-        $purchaseId = \Illuminate\Support\Facades\DB::table('purchases')->insertGetId([
+        $purchase = \App\Models\Purchase::create([
             'title' => 'Compra Teste',
-            'supplier_id' => $supplierId,
+            'supplier_id' => $supplier->id,
             'user_id' => $user->id,
             'count_value' => 0,
             'status' => 'paid',
-            'purchase_date' => $now,
-            'created_at' => $now,
-            'updated_at' => $now,
+            'purchase_date' => $now->format('Y-m-d'),
         ]);
 
-        \Illuminate\Support\Facades\DB::table('product_purchase')->insert([
-            ['purchase_id' => $purchaseId, 'product_id' => $productArroz->id, 'amount' => 100, 'purchase_value' => 25, 'created_at' => $now, 'updated_at' => $now],
-            ['purchase_id' => $purchaseId, 'product_id' => $productPilha->id, 'amount' => 50, 'purchase_value' => 10, 'created_at' => $now, 'updated_at' => $now],
-            ['purchase_id' => $purchaseId, 'product_id' => $productTomate->id, 'amount' => 200, 'purchase_value' => 2, 'created_at' => $now, 'updated_at' => $now],
+        $purchase->products()->attach([
+            $productArroz->id => ['amount' => 100, 'purchase_value' => 25],
+            $productPilha->id => ['amount' => 50, 'purchase_value' => 10],
+            $productTomate->id => ['amount' => 200, 'purchase_value' => 2],
         ]);
 
         // Venda 1: Alto Volume de Arroz (que dará prejuízo)
-        $sale1Id = \Illuminate\Support\Facades\DB::table('sales')->insertGetId([
-            'discount' => 0, 'total_value' => 2200, 'delivery_price' => 0, 'user_id' => $user->id, 'created_at' => $now, 'updated_at' => $now
+        $sale1 = \App\Models\Sale::create([
+            'discount' => 0, 'total_value' => 2200, 'delivery_price' => 0, 'user_id' => $user->id
         ]);
-        \Illuminate\Support\Facades\DB::table('product_sale')->insert([
-            'sale_id' => $sale1Id, 'product_id' => $productArroz->id, 'amount' => 100, 'sale_value' => 22, 'created_at' => $now, 'updated_at' => $now
+        $sale1->products()->attach([
+            $productArroz->id => ['amount' => 100, 'sale_value' => 22]
         ]);
 
         // Venda 2: Baixo volume de Pilha, mas alta margem (lucro)
-        $sale2Id = \Illuminate\Support\Facades\DB::table('sales')->insertGetId([
-            'discount' => 0, 'total_value' => 600, 'delivery_price' => 0, 'user_id' => $user->id, 'created_at' => $now, 'updated_at' => $now
+        $sale2 = \App\Models\Sale::create([
+            'discount' => 0, 'total_value' => 600, 'delivery_price' => 0, 'user_id' => $user->id
         ]);
-        \Illuminate\Support\Facades\DB::table('product_sale')->insert([
-            'sale_id' => $sale2Id, 'product_id' => $productPilha->id, 'amount' => 30, 'sale_value' => 20, 'created_at' => $now, 'updated_at' => $now
+        $sale2->products()->attach([
+            $productPilha->id => ['amount' => 30, 'sale_value' => 20]
         ]);
 
         $domain = tenant()->domains->first()->domain;
