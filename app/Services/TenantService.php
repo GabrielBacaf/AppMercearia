@@ -23,7 +23,7 @@ class TenantService
             // Cria o usuário Admin inicial na mercearia (já no banco de dados da loja)
             $user = \App\Models\User::create([
                 'name' => $data['admin_name'],
-                'login' => explode('@', $data['admin_email'])[0],
+                'login' => $data['admin_login'],
                 'email' => $data['admin_email'],
                 'password' => Hash::make($data['admin_password']),
             ]);

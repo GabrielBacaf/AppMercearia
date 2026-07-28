@@ -19,6 +19,7 @@ class StoreTenantRequest extends FormRequest
             'id' => ['required', 'string', 'unique:tenants,id'],
             'domain' => ['required', 'string', 'unique:domains,domain'],
             'admin_name' => ['required', 'string', 'max:255'],
+            'admin_login' => ['required', 'string', 'max:255'],
             'admin_email' => ['required', 'email'],
             'admin_password' => ['required', 'string', 'min:8'],
         ];
@@ -30,6 +31,7 @@ class StoreTenantRequest extends FormRequest
             'id' => 'ID da Loja',
             'domain' => 'Domínio',
             'admin_name' => 'Nome do Administrador',
+            'admin_login' => 'Login do Administrador',
             'admin_email' => 'E-mail do Administrador',
             'admin_password' => 'Senha do Administrador',
         ];

@@ -31,6 +31,7 @@ class TenantCreationTest extends TestCase
             'id' => 'mercearia-do-joao',
             'domain' => 'joao.erpmercearia.test',
             'admin_name' => 'João',
+            'admin_login' => 'joao',
             'admin_email' => 'joao@mercearia.com',
             'admin_password' => 'password123',
         ]);
@@ -49,6 +50,7 @@ class TenantCreationTest extends TestCase
         $tenant->run(function () {
             $this->assertDatabaseHas('users', [
                 'email' => 'joao@mercearia.com',
+                'login' => 'joao',
                 'name' => 'João'
             ]);
         });
