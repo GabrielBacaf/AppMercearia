@@ -37,6 +37,7 @@ Route::middleware([
         Route::apiResource('suppliers', \App\Http\Controllers\Api\V1\SupplierController::class)->except('destroy');
         Route::apiResource('clients', \App\Http\Controllers\Api\V1\ClientController::class)->except('destroy');
         Route::apiResource('sales', \App\Http\Controllers\Api\V1\SaleController::class);
+        Route::get('enums', [\App\Http\Controllers\Api\V1\EnumController::class, 'index'])->name('enums.index');
 
         // Financial Module
         Route::prefix('financial')->group(function () {
