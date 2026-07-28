@@ -37,5 +37,16 @@ Route::middleware([
         Route::apiResource('suppliers', \App\Http\Controllers\Api\V1\SupplierController::class)->except('destroy');
         Route::apiResource('clients', \App\Http\Controllers\Api\V1\ClientController::class)->except('destroy');
         Route::apiResource('sales', \App\Http\Controllers\Api\V1\SaleController::class);
+
+        // Financial Module
+        Route::prefix('financial')->group(function () {
+            Route::get('dashboard', [\App\Http\Controllers\Api\V1\FinancialReportController::class, 'dashboard'])->name('dashboard');
+
+            Route::apiResource('payables', \App\Http\Controllers\AccountPayableController::class)->only(['index', 'store']);
+            Route::post('payables/{payable}/settle', [\App\Http\Controllers\AccountPayableController::class, 'settle'])->name('payables.settle');
+
+            Route::apiResource('receivables', \App\Http\Controllers\AccountReceivableController::class)->only(['index', 'store']);
+            Route::post('receivables/{receivable}/settle', [\App\Http\Controllers\AccountReceivableController::class, 'settle'])->name('receivables.settle');
+        });
     });
 });

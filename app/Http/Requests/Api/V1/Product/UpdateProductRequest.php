@@ -22,13 +22,13 @@ class UpdateProductRequest extends FormRequest
         return [
             'barcode' => ['required', 'string', 'max:14', Rule::unique('products', 'barcode')->ignore($productId)],
             'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($productId)],
-            'expiration_date' => ['sometimes', 'nullable', 'date', 'date_format:Y-m-d', 'after_or_equal:today'],
+            'expiration_date' => ['sometimes', 'date', 'after_or_equal:today'],
             'sale_value' => ['required', 'numeric', 'min:0'],
-            'category' => ['required', 'string', Rule::in(CategoryEnum::values())],
+            'category_id' => ['required', Rule::exists('categories', 'id')],
             'stock_quantity' => ['prohibited'],
             'amount' => ['required', 'integer', 'min:0'],
             'purchase_id' => ['required', 'integer', 'exists:purchases,id'],
-            'purchase_value' => ['required', 'numeric'],
+            'purchase_value' => ['required', 'numeric', 'min:0'],
         ];
     }
 
@@ -39,11 +39,11 @@ class UpdateProductRequest extends FormRequest
             'name' => 'Nome do Produto',
             'expiration_date' => 'Data de Validade',
             'sale_value' => 'Preço de venda',
-            'category' => 'Categoria',
+            'category_id' => 'Categoria',
             'purchase_value' => 'Valor de Compra',
             'purchase_id' => 'Compra',
             'amount' => 'Quantidade',
-            'stock_quantity' => 'Quantidade em Estoque',
+            'stock_quantity' => 'Quantidade total em estoque',
         ];
     }
 

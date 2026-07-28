@@ -2,16 +2,17 @@
 
 namespace App\Http\Services;
 
-use App\Models\Payment;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use App\Models\Sale;
 use Exception;
 
-
 class SaleService
 {
-    public function __construct(protected PaymentService $paymentService) {}
+    public function __construct(
+        protected PaymentService $paymentService,
+        protected AccountReceivableService $receivableService
+    ) {}
 
     public function store(array $data)
     {
@@ -41,12 +42,25 @@ class SaleService
             $data['total_value'] = ($subTotal + $delivery) - $discount;
 
             $sale = Sale::create($data);
-
             $sale->products()->sync($pivotData);
 
-            $this->paymentService->syncPayments($sale, $data['payments'] ?? []);
+            $installments = $data['installments'] ?? 1;
+            
+            // Generate Accounts Receivable
+            $this->receivableService->generateFromSale($sale, $installments);
 
-            $sale->load('products', 'payments');
+            // Fetch the first receivable to apply immediate payment if provided
+            $firstReceivable = $sale->accountsReceivable()->orderBy('due_date', 'asc')->first();
+
+            if ($firstReceivable && !empty($data['payments'])) {
+                // Here we assume the provided payment is for the first installment.
+                // In a real scenario, we might iterate over payments.
+                foreach ($data['payments'] as $paymentData) {
+                    $this->receivableService->settle($firstReceivable, $paymentData);
+                }
+            }
+
+            $sale->load('products', 'accountsReceivable.payments');
 
             return $sale;
         });

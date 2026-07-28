@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Product extends Model
 {
@@ -16,7 +17,7 @@ class Product extends Model
         'name',
         'expiration_date',
         'sale_value',
-        'category',
+        'category_id',
         'stock_quantity',
         'purchase_id',
         'purchase_value',
@@ -35,6 +36,11 @@ class Product extends Model
         return $this->belongsToMany(Purchase::class)
             ->withPivot('amount', 'purchase_value', 'expiration_date')
             ->withTimestamps();
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public static function updateStock(array $products)
