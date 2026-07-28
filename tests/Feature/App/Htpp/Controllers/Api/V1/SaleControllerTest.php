@@ -110,7 +110,7 @@ class SaleControllerTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('payments', [
-            'payable_type' => \App\Models\Sale::class,
+            'payable_type' => \App\Models\AccountReceivable::class,
             'value' => 53.00,
         ]);
     }

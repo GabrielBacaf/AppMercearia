@@ -47,7 +47,7 @@ class AccountReceivableService
     {
         // Add the payment to the receivable
         $receivable->payments()->create([
-            'value' => $paymentData['amount'],
+            'value' => $paymentData['value'],
             'payment_type' => $paymentData['payment_type'],
             'payment_status' => 'Pago' 
         ]);
