@@ -16,19 +16,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class FinancialDashboardTest extends TestCase
 {
-    use RefreshDatabase;
-
-    protected bool $initializeTenancy = false;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        
-        $tenantId = 'test-tenant-' . uniqid();
-        $tenant = Tenant::create(['id' => $tenantId]);
-        $tenant->domains()->create(['domain' => $tenantId . '.test']);
-        tenancy()->initialize($tenant);
-    }
+    // Removed RefreshDatabase and custom setUp to use TestCase base configuration
 
     public function test_dashboard_returns_correct_caixa_metrics()
     {
