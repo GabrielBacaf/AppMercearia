@@ -25,9 +25,9 @@ class PurchaseResource extends JsonResource
             'status' => $this->status,
             'user_id' => $this->user_id,
 
-            //  Carregando os pagamentos corretamente
-            'payments' => $this->whenLoaded('payments', function () {
-                return $this->payments->map(function ($payment) {
+            //  Carregando os pagamentos corretamente através das contas a pagar
+            'payments' => $this->whenLoaded('accountsPayable', function () {
+                return $this->accountsPayable->pluck('payments')->flatten()->map(function ($payment) {
                     return [
                         'id' => $payment->id,
                         'value' => $payment->value,
@@ -35,7 +35,7 @@ class PurchaseResource extends JsonResource
                         'payable_id' => $payment->payable_id,
                         'payment_type' => $payment->payment_type,
                     ];
-                });
+                })->values();
             }),
         ];
     }

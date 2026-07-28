@@ -21,7 +21,7 @@ class PurchaseController extends Controller
     {
         $this->authorize(PurchasePermissionEnum::INDEX->value);
 
-        $purchases = Purchase::with('payments')->paginate(5);
+        $purchases = Purchase::with('accountsPayable.payments')->paginate(5);
         return $this->successResponseCollection(
             PurchaseResource::collection($purchases),
             $purchases,
@@ -39,7 +39,7 @@ class PurchaseController extends Controller
         );
 
         return $this->successResponse(
-            new PurchaseResource($purchase->load('payments')),
+            new PurchaseResource($purchase->load('accountsPayable.payments')),
             "Compra e pagamento inicial registrados com sucesso!",
             201
         );
@@ -50,7 +50,7 @@ class PurchaseController extends Controller
         $this->authorize(PurchasePermissionEnum::SHOW->value);
 
         return $this->successResponse(
-            new PurchaseResource($purchase->load('payments')),
+            new PurchaseResource($purchase->load('accountsPayable.payments')),
             'Compra detalhado com sucesso!',
             200
         );
@@ -67,7 +67,7 @@ class PurchaseController extends Controller
         );
 
         return $this->successResponse(
-            new PurchaseResource($purchase->load('payments')),
+            new PurchaseResource($purchase->load('accountsPayable.payments')),
             "Compra e pagamento inicial atualizados com sucesso!",
             200
         );

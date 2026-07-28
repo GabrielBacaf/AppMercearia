@@ -42,9 +42,10 @@ abstract class TestCase extends BaseTestCase
         tenancy()->end();
 
         if ($this->tenant) {
+            $this->tenant->delete();
             $dbPath = database_path('tenant' . $this->tenant->id);
             if (file_exists($dbPath)) {
-                unlink($dbPath);
+                @unlink($dbPath);
             }
         }
         parent::tearDown();
