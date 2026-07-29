@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Api\V1\User;
 
-use App\Enums\UserPermissionEnum;
+use App\Enums\Permissions\UserPermissionEnum;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;

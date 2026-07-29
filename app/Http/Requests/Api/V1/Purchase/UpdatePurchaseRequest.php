@@ -5,7 +5,7 @@ namespace App\Http\Requests\Api\V1\Purchase;
 use App\Enums\CategoryEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Enums\PaymentTypeEnum;
-use App\Enums\PurchasePermissionEnum;
+use App\Enums\Permissions\PurchasePermissionEnum;
 use App\Enums\StatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;

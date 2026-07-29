@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Enums\PermissionEnum;
-use App\Enums\ProductPermissionEnum;
+use App\Enums\Permissions\PermissionEnum;
+use App\Enums\Permissions\ProductPermissionEnum;
 use App\Http\Requests\Api\V1\Product\StoreProductRequest;
 use App\Http\Requests\Api\V1\Product\UpdateProductRequest;
 use App\Http\Resources\V1\Permission\PermissionResource;
@@ -17,14 +17,13 @@ class PermissionController extends Controller
     {
         $this->authorize(PermissionEnum::INDEX->value);
 
-        $permissions = Permission::paginate(5);
+        $permissions = Permission::select('id', 'name')->get();
 
-        return $this->successResponseCollection(
-            PermissionResource::collection($permissions),
-            $permissions,
-            "Permissões listados com sucesso!",
-            200
-        );
+        return response()->json([
+            'success' => true,
+            'message' => 'Permissões listadas com sucesso!',
+            'data'    => $permissions
+        ], 200);
     }
 
     public function store(StoreProductRequest $request)

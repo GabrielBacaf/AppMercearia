@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Enums\SalePermissionEnum;
-use App\Enums\SalesPermissionEnum;
+use App\Enums\Permissions\SalePermissionEnum;
+use App\Enums\Permissions\SalesPermissionEnum;
 use App\Http\Requests\Api\V1\Sale\StoreSaleRequest;
 use App\Http\Resources\V1\Sale\SaleResource;
 use App\Http\Services\SaleService;

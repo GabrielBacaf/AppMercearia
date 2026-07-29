@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\App\Htpp\Controllers\Api\V1;
 
-use App\Enums\ClientPermissionEnum;
+use App\Enums\Permissions\ClientPermissionEnum;
 use App\Models\Client;
 use Tests\TestCase;
 

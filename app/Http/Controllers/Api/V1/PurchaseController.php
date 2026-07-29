@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Enums\PurchasePermissionEnum;
+use App\Enums\Permissions\PurchasePermissionEnum;
 use App\Http\Requests\Api\V1\Purchase\StorePurchaseRequest;
 use App\Http\Requests\Api\V1\Purchase\UpdatePurchaseRequest;
 use App\Http\Resources\V1\Purchase\PurchaseResource;

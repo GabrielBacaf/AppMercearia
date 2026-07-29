@@ -4,7 +4,7 @@ namespace Tests\Feature\App\Htpp\Controllers\Api\V1;
 
 use App\Enums\PaymentStatusEnum;
 use App\Enums\PaymentTypeEnum;
-use App\Enums\SalePermissionEnum;
+use App\Enums\Permissions\SalePermissionEnum;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;

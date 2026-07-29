@@ -16,7 +16,20 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolesAndPermissionsSeeder::class,
-            CategorySeeder::class,
         ]);
+
+        // Rodar seeders do banco CENTRAL apenas (ex: Super Admin)
+        if (!tenant()) {
+            $this->call([
+                UserSeeder::class,
+            ]);
+        }
+
+        // Rodar seeders específicos de tenant (loja) apenas se estivermos num contexto de tenant
+        if (tenant()) {
+            $this->call([
+                CategorySeeder::class,
+            ]);
+        }
     }
 }

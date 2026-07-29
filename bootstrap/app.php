@@ -34,6 +34,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
                 $statusCode = 500;
                 if ($e instanceof HttpException) {
                     $statusCode = $e->getStatusCode();
+                } elseif ($e instanceof \Illuminate\Auth\AuthenticationException) {
+                    $statusCode = 401;
+                } elseif ($e instanceof \Illuminate\Auth\Access\AuthorizationException) {
+                    $statusCode = 403;
                 } elseif ($e instanceof \Illuminate\Validation\ValidationException) {
                     $statusCode = $e->status;
                     $errorDetails['validation'] = $e->errors();

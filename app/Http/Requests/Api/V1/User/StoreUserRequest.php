@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Api\V1\User;
 
-use App\Enums\UserPermissionEnum;
+use App\Enums\Permissions\UserPermissionEnum;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -28,7 +28,6 @@ class StoreUserRequest extends FormRequest
             'roles' => ['required', 'array', 'min:1'],
             'roles.*' => [Rule::exists('roles', 'name')],
             'status' => ['sometimes', 'boolean'],
-
         ];
     }
     public function attributes(): array

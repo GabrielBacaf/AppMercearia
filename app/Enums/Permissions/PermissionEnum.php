@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Enums;
+namespace App\Enums\Permissions;
 
 enum PermissionEnum :string
 {
-    case INDEX = 'index permission';
+    case INDEX = 'listar permissoes';
 
     public static function values(): array
     {

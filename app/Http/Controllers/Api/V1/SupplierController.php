@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Enums\SupplierPermissionEnum;
+use App\Enums\Permissions\SupplierPermissionEnum;
 use App\Http\Requests\Api\V1\Supplier\SupplierRequest;
 use App\Http\Resources\V1\Supplier\SupplierResource;
 use App\Models\Supplier;

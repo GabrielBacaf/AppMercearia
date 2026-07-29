@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Enums\RolePermissionEnum;
+use App\Enums\Permissions\RolePermissionEnum;
 
 use App\Http\Controllers\Api\V1\Controller;
 use App\Http\Requests\Api\V1\Role\StoreRoleRequest;

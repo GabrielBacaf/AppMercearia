@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Enums\ProductPermissionEnum;
+use App\Enums\Permissions\ProductPermissionEnum;
 use App\Http\Controllers\Api\V1\Controller;
 use App\Http\Requests\Api\V1\Product\StoreProductRequest;
 use App\Http\Requests\Api\V1\Product\UpdateProductRequest;

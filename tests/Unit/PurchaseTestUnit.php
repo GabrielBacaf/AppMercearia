@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use App\Enums\PaymentStatusEnum;
-use App\Enums\PurchasePermissionEnum;
+use App\Enums\Permissions\PurchasePermissionEnum;
 use App\Enums\StatusEnum;
 use App\Models\Payment;
 use App\Models\Product;

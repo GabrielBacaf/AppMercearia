@@ -53,6 +53,28 @@ class TenantCreationTest extends TestCase
                 'login' => 'joao',
                 'name' => 'João'
             ]);
+            
+            // Verifica se o papel admin foi criado
+            $this->assertDatabaseHas('roles', [
+                'name' => 'admin',
+                'guard_name' => 'api'
+            ]);
+            
+            // Verifica se as permissões foram semeadas
+            $this->assertDatabaseCount('permissions', count(array_merge(
+                \App\Enums\Permissions\UserPermissionEnum::values(),
+                \App\Enums\Permissions\RolePermissionEnum::values(),
+                \App\Enums\Permissions\PermissionEnum::values(),
+                \App\Enums\Permissions\ProductPermissionEnum::values(),
+                \App\Enums\Permissions\PurchasePermissionEnum::values(),
+                \App\Enums\Permissions\SupplierPermissionEnum::values(),
+                \App\Enums\Permissions\ClientPermissionEnum::values(),
+                \App\Enums\Permissions\SalePermissionEnum::values()
+            )));
+            
+            // Verifica se o usuário tem o papel admin associado
+            $user = \App\Models\User::where('email', 'joao@mercearia.com')->first();
+            $this->assertTrue($user->hasRole('admin'));
         });
     }
 }

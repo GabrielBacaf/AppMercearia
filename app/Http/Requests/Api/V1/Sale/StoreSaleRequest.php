@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api\V1\Sale;
 
 use App\Enums\PaymentStatusEnum;
 use App\Enums\PaymentTypeEnum;
-use App\Enums\SalePermissionEnum;
+use App\Enums\Permissions\SalePermissionEnum;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;

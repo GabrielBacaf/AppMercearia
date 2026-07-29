@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Api\V1\Supplier;
 
-use App\Enums\SupplierPermissionEnum;
+use App\Enums\Permissions\SupplierPermissionEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;

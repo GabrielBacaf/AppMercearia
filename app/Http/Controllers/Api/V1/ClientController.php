@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Enums\ClientPermissionEnum;
+use App\Enums\Permissions\ClientPermissionEnum;
 use App\Http\Requests\Api\V1\Client\ClientRequest;
 use App\Http\Resources\V1\Client\ClientResource;
 use App\Http\Services\ClientService;

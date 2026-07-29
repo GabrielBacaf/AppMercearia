@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\App\Htpp\Controllers\Api\V1;
 
-use App\Enums\ProductPermissionEnum;
-use App\Enums\PurchasePermissionEnum;
+use App\Enums\Permissions\ProductPermissionEnum;
+use App\Enums\Permissions\PurchasePermissionEnum;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Purchase;

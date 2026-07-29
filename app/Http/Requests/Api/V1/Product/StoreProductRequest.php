@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Api\V1\Product;
 
 use App\Enums\CategoryEnum;
-use App\Enums\ProductPermissionEnum;
+use App\Enums\Permissions\ProductPermissionEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;

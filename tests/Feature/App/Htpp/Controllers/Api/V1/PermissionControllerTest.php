@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\App\Htpp\Controllers\Api\V1;
 
-use App\Enums\PermissionEnum;
+use App\Enums\Permissions\PermissionEnum;
 use App\Models\User;
 use Database\Factories\PermissionFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -45,6 +45,7 @@ class PermissionControllerTest extends TestCase
             ]
         ]);
 
-        $response->assertJsonCount(5, 'data');
+        $expectedCount = Permission::count();
+        $response->assertJsonCount($expectedCount, 'data');
     }
 }

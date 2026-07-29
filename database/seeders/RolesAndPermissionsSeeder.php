@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use App\Enums\ClientPermissionEnum;
-use App\Enums\PermissionEnum;
-use App\Enums\ProductPermissionEnum;
-use App\Enums\PurchasePermissionEnum;
-use App\Enums\RolePermissionEnum;
-use App\Enums\SalePermissionEnum;
-use App\Enums\SupplierPermissionEnum;
-use App\Enums\UserPermissionEnum;
+use App\Enums\Permissions\ClientPermissionEnum;
+use App\Enums\Permissions\PermissionEnum;
+use App\Enums\Permissions\ProductPermissionEnum;
+use App\Enums\Permissions\PurchasePermissionEnum;
+use App\Enums\Permissions\RolePermissionEnum;
+use App\Enums\Permissions\SalePermissionEnum;
+use App\Enums\Permissions\SupplierPermissionEnum;
+use App\Enums\Permissions\UserPermissionEnum;
 use Spatie\Permission\Models\Role;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;

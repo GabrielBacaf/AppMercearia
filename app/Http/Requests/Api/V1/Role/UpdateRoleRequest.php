@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Api\V1\Role;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Enums\RolePermissionEnum;
+use App\Enums\Permissions\RolePermissionEnum;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Rule;

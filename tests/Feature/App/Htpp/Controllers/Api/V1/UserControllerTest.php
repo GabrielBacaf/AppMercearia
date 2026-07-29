@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\App\Htpp\Controllers\Api\V1;
 
-use App\Enums\UserPermissionEnum;
+use App\Enums\Permissions\UserPermissionEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
