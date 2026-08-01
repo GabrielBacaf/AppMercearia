@@ -21,21 +21,7 @@ class ProductController extends Controller
     {
         $this->authorize(ProductPermissionEnum::INDEX->value);
 
-        $query = Product::query();
-        
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('barcode', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->has('barcode')) {
-            $query->where('barcode', $request->barcode);
-        }
-
-        $products = $query->latest()->paginate(5);
+        $products = Product::latest()->paginate(5);
 
         return $this->successResponseCollection(
             ProductResource::collection($products),
