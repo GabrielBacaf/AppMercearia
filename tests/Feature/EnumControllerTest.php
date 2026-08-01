@@ -3,13 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class EnumControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function test_it_requires_authentication(): void
     {
         $response = $this->getJson(route('enums.index'));
