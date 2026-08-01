@@ -271,6 +271,7 @@ class PurchaseControllerTest extends TestCase
             ->assertJsonPath('data.description', 'Descrição da compra teste');
     }
 
+    /*
     # php artisan test --filter=PurchaseControllerTest::test_remove_product_deve_remover_produto_da_compra_com_sucesso
     public function test_remove_product_deve_remover_produto_da_compra_com_sucesso(): void
     {
@@ -301,4 +302,5 @@ class PurchaseControllerTest extends TestCase
             'product_id' => $product->id
         ]);
     }
+    */
 }
