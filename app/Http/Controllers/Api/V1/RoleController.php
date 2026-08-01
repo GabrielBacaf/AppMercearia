@@ -27,13 +27,7 @@ class RoleController extends Controller
     {
         $this->authorize(RolePermissionEnum::INDEX->value);
         
-        $query = Role::query();
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where('name', 'like', "%{$search}%");
-        }
-        
-        $roles = $query->latest()->paginate(5);
+        $roles = Role::latest()->paginate(5);
         return $this->successResponseCollection(
             RoleResource::collection($roles),
             $roles,
@@ -45,37 +39,25 @@ class RoleController extends Controller
     public function store(StoreRoleRequest $request)
     {
         $this->authorize(RolePermissionEnum::STORE->value);
-        try {
-            $role = $this->roleService->storeRole($request->validated());
-            return $this->successResponse(
-                new RoleResource($role),
-                'Perfil criado com sucesso!',
-                201
-            );
-        } catch (Throwable $e) {
-            Log::error('Erro ao criar perfil', ['exception' => $e]);
-            return $this->errorResponse('Erro ao criar perfil', [], 500);
-        }
+        $role = $this->roleService->storeRole($request->validated());
+        return $this->successResponse(
+            new RoleResource($role),
+            'Perfil criado com sucesso!',
+            201
+        );
     }
 
     public function update(UpdateRoleRequest $request, Role $role)
     {
         $this->authorize(RolePermissionEnum::UPDATE->value);
 
-        try {
+        $updatedRole = $this->roleService->updateRole($role, $request->validated());
 
-            $updatedRole = $this->roleService->updateRole($role, $request->validated());
-
-            return $this->successResponse(
-                new RoleResource($updatedRole),
-                'Perfil atualizado com sucesso!',
-                200
-            );
-        } catch (Throwable $e) {
-
-            Log::error('Erro ao ATUALIZAR perfil', ['exception' => $e]);
-            return $this->errorResponse('Erro ao ATUALIZAR perfil', [], 500);
-        }
+        return $this->successResponse(
+            new RoleResource($updatedRole),
+            'Perfil atualizado com sucesso!',
+            200
+        );
     }
 
 }

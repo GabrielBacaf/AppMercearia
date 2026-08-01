@@ -42,11 +42,11 @@ Route::middleware([
         Route::prefix('financial')->group(function () {
             Route::get('dashboard', [\App\Http\Controllers\Api\V1\FinancialReportController::class, 'dashboard'])->name('dashboard');
 
-            Route::apiResource('payables', \App\Http\Controllers\AccountPayableController::class)->only(['index', 'store']);
-            Route::post('payables/{payable}/settle', [\App\Http\Controllers\AccountPayableController::class, 'settle'])->name('payables.settle');
+            Route::apiResource('payables', \App\Http\Controllers\Api\V1\AccountPayableController::class)->only(['index', 'store']);
+            Route::post('payables/{payable}/settle', [\App\Http\Controllers\Api\V1\AccountPayableController::class, 'settle'])->name('payables.settle');
 
-            Route::apiResource('receivables', \App\Http\Controllers\AccountReceivableController::class)->only(['index', 'store']);
-            Route::post('receivables/{receivable}/settle', [\App\Http\Controllers\AccountReceivableController::class, 'settle'])->name('receivables.settle');
+            Route::apiResource('receivables', \App\Http\Controllers\Api\V1\AccountReceivableController::class)->only(['index', 'store']);
+            Route::post('receivables/{receivable}/settle', [\App\Http\Controllers\Api\V1\AccountReceivableController::class, 'settle'])->name('receivables.settle');
         });
     });
 });

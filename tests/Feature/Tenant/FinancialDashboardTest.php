@@ -44,8 +44,8 @@ class FinancialDashboardTest extends TestCase
         AccountReceivable::factory()->create([
             'amount' => 300,
             'status' => FinancialStatusEnum::RECEIVED,
-            'received_date' => $now->copy()->subMonth(),
-            'due_date' => $now->copy()->subMonth(),
+            'received_date' => $now->copy()->subMonthsNoOverflow(1),
+            'due_date' => $now->copy()->subMonthsNoOverflow(1),
         ]);
 
         // Despesas no Caixa

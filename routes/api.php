@@ -23,5 +23,7 @@ Route::prefix('v1')->group(function () {
 
         // Gerenciamento de Tenants (Lojas) pelo Super Admin
         Route::apiResource('tenants', \App\Http\Controllers\Api\V1\Central\CentralTenantController::class);
+
+        Route::get('enums', [EnumController::class, 'index'])->name('enums.index');
     });
 });

@@ -9,24 +9,16 @@ use App\Http\Resources\V1\User\UserResource;
 use Illuminate\Support\Arr;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Hash;
+use App\Http\Services\UserService;
 
 class UserController extends Controller
 {
+    public function __construct(protected UserService $userService) {}
     public function index(\Illuminate\Http\Request $request): JsonResponse
     {
         $this->authorize(UserPermissionEnum::INDEX->value);
 
-        $query = User::query();
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
-        }
-
-        $users = $query->latest()->paginate(5);
+        $users = User::latest()->paginate(5);
 
         return $this->successResponseCollection(
             UserResource::collection($users),
@@ -40,10 +32,7 @@ class UserController extends Controller
     {
         $this->authorize(UserPermissionEnum::STORE->value);
 
-        $validatedData = $request->validated();
-
-        $user = User::create(Arr::except($validatedData, ['roles']));
-        $user->assignRole($validatedData['roles']);
+        $user = $this->userService->storeUser($request->validated());
 
         return $this->successResponse(new UserResource($user), 'Usuário criado com sucesso!', 201);
     }
@@ -59,13 +48,7 @@ class UserController extends Controller
     {
         $this->authorize(UserPermissionEnum::UPDATE->value);
 
-        $validatedData = $request->validated();
-
-        if (isset($validatedData['password'])) {
-            $validatedData['password'] = Hash::make($validatedData['password']);
-        }
-        $user->update(Arr::except($validatedData, ['roles']));
-        $user->assignRole($validatedData['roles']);
+        $user = $this->userService->updateUser($user, $request->validated());
 
         return $this->successResponse(new UserResource($user), 'Usuário atualizado com sucesso!', 200);
     }
