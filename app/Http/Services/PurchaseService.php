@@ -60,4 +60,13 @@ class PurchaseService
             return $purchase;
         });
     }
+
+    public function deletePurchase(Purchase $purchase): void
+    {
+        if ($purchase->products()->count() > 0) {
+            abort(400, 'A compra possui vínculo com produtos');
+        }
+
+        $purchase->delete();
+    }
 }

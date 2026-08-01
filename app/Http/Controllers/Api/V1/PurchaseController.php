@@ -79,11 +79,8 @@ class PurchaseController extends Controller
     {
         $this->authorize(PurchasePermissionEnum::DESTROY->value);
 
-        if ($purchase->products()->count() === 0) {
-            $purchase->delete();
-            return $this->successResponse([], 'Compra deletada com sucesso!', 200);
-        }
-
-        return $this->errorResponse('A compra possui vínculo com produtos', [], 400);
+        $this->purchaseService->deletePurchase($purchase);
+        
+        return $this->successResponse([], 'Compra deletada com sucesso!', 200);
     }
 }

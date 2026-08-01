@@ -10,24 +10,24 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
 
+use App\Http\Services\AuthService;
+
 class AuthController extends Controller
 {
-    public function __construct() {}
+    public function __construct(protected AuthService $authService) {}
 
     public function login(AuthRequest $request): JsonResponse
     {
-        $user = User::where('login', $request->login)->first();
+        $tokenData = $this->authService->login($request->validated(), $request->device_name);
 
-        if ($user && Hash::check($request->password, $user->password)) {
+        if (!empty($tokenData)) {
             return $this->successResponse(
-                [
-                    'access_token' => $user->createToken($request->device_name)->plainTextToken,
-                    'token_type' => 'Bearer',
-                ],
+                $tokenData,
                 'Seja bem-vindo(a)!',
                 200,
             );
         }
+        
         return $this->errorResponse('Not Authorized', [], 401);
     }
 

@@ -7,6 +7,8 @@ use App\Http\Requests\Api\V1\Client\ClientRequest;
 use App\Http\Resources\V1\Client\ClientResource;
 use App\Http\Services\ClientService;
 use App\Models\Client;
+use App\Http\Services\LocationService;
+use Exception;
 
 
 class ClientController extends Controller
@@ -19,17 +21,7 @@ class ClientController extends Controller
     {
         $this->authorize(ClientPermissionEnum::INDEX->value);
 
-        $query = Client::with('address');
-
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
-        }
-
-        $clients = $query->latest()->paginate(5);
+        $clients = Client::with('address')->latest()->paginate(5);
         return $this->successResponseCollection(
             ClientResource::collection($clients),
             $clients,
@@ -75,7 +67,7 @@ class ClientController extends Controller
         );
     }
 
-    public function extractLocation(\Illuminate\Http\Request $request)
+    public function extractLocation(\Illuminate\Http\Request $request, LocationService $locationService)
     {
         $link = $request->input('link');
 
@@ -83,74 +75,11 @@ class ClientController extends Controller
             return response()->json(['error' => 'Link is required'], 400);
         }
 
-        $lat = null;
-        $lng = null;
-
-        // 1. Regex directly on the input
-        if (preg_match('/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/', $link, $matches)) {
-            $lat = $matches[1];
-            $lng = $matches[2];
-        }
-
-        // 2. Try fetching URL if coords not found yet
-        if (!$lat && filter_var($link, FILTER_VALIDATE_URL)) {
-            try {
-                $response = \Illuminate\Support\Facades\Http::withOptions(['allow_redirects' => false])->get($link);
-                $redirectUrl = $response->header('Location');
-
-                if ($redirectUrl && preg_match('/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/', $redirectUrl, $matches)) {
-                    $lat = $matches[1];
-                    $lng = $matches[2];
-                }
-
-                if (!$lat) {
-                    $responseFull = \Illuminate\Support\Facades\Http::get($link);
-                    if (preg_match('/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/', $responseFull->body(), $matches)) {
-                        $lat = $matches[1];
-                        $lng = $matches[2];
-                    }
-                }
-            } catch (\Exception $e) {
-                // Ignore and proceed to fail
-            }
-        }
-
-        if ($lat && $lng) {
-            $addressData = [
-                'latitude' => $lat,
-                'longitude' => $lng,
-                'street' => '',
-                'number' => '',
-                'city' => '',
-                'state' => '',
-                'postal_code' => '',
-                'country' => ''
-            ];
-
-            // Reverse Geocoding with OpenStreetMap Nominatim
-            try {
-                $geocodeUrl = "https://nominatim.openstreetmap.org/reverse?format=json&lat={$lat}&lon={$lng}&zoom=18&addressdetails=1";
-                $geoResponse = \Illuminate\Support\Facades\Http::withHeaders([
-                    'User-Agent' => 'AppMercearia/1.0'
-                ])->get($geocodeUrl);
-
-                if ($geoResponse->successful() && $geoResponse->json('address')) {
-                    $addr = $geoResponse->json('address');
-                    
-                    $addressData['street'] = $addr['road'] ?? $addr['street'] ?? $addr['pedestrian'] ?? '';
-                    $addressData['number'] = $addr['house_number'] ?? '';
-                    $addressData['city'] = $addr['city'] ?? $addr['town'] ?? $addr['village'] ?? $addr['municipality'] ?? '';
-                    $addressData['state'] = $addr['state'] ?? '';
-                    $addressData['postal_code'] = $addr['postcode'] ?? '';
-                    $addressData['country'] = $addr['country'] ?? '';
-                }
-            } catch (\Exception $e) {
-                // Return just coordinates if geocoding fails
-            }
-
+        try {
+            $addressData = $locationService->extractFromLink($link);
             return response()->json($addressData);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
-
-        return response()->json(['error' => 'Não foi possível extrair as coordenadas'], 400);
     }
 }

@@ -41,21 +41,17 @@ class CentralTenantController extends Controller
         );
     }
 
-    public function show(string $id)
+    public function show(Tenant $tenant)
     {
-        $tenant = Tenant::with('domains')->findOrFail($id);
-
         return $this->successResponse(
-            new TenantResource($tenant),
+            new TenantResource($tenant->load('domains')),
             'Tenant detalhado com sucesso!',
             200
         );
     }
 
-    public function update(UpdateTenantRequest $request, string $id)
+    public function update(UpdateTenantRequest $request, Tenant $tenant)
     {
-        $tenant = Tenant::findOrFail($id);
-        
         $tenant = $this->tenantService->updateTenant($tenant, $request->validated());
 
         return $this->successResponse(
@@ -65,10 +61,8 @@ class CentralTenantController extends Controller
         );
     }
 
-    public function destroy(string $id)
+    public function destroy(Tenant $tenant)
     {
-        $tenant = Tenant::findOrFail($id);
-        
         $this->tenantService->deleteTenant($tenant);
         
         return $this->successResponse(

@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Auth\AuthenticationException;
 use App\Console\Kernel as ConsoleKernel;
 
 // Cria a aplicação
@@ -39,6 +40,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
                     $errorDetails['validation'] = $e->errors();
                 } elseif ($e instanceof \DomainException || $e instanceof \InvalidArgumentException) {
                     $statusCode = 400;
+                } elseif ($e instanceof AuthenticationException) {
+                    $statusCode = 401;
                 }
 
                 return response()->json([

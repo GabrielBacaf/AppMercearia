@@ -16,22 +16,7 @@ class SaleController extends Controller
     {
         $this->authorize(SalePermissionEnum::INDEX->value);
 
-        $query = Sale::with('products', 'client', 'payments');
-        
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->whereHas('client', function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
-            });
-        }
-        if ($request->filled('date_start')) {
-            $query->whereDate('created_at', '>=', $request->input('date_start'));
-        }
-        if ($request->filled('date_end')) {
-            $query->whereDate('created_at', '<=', $request->input('date_end'));
-        }
-
-        $sales = $query->latest()->paginate(5);
+        $sales = Sale::with('products', 'client', 'payments')->latest()->paginate(5);
         return $this->successResponseCollection(
             SaleResource::collection($sales),
             $sales,
@@ -69,21 +54,13 @@ class SaleController extends Controller
     {
         $this->authorize(SalePermissionEnum::UPDATE->value);
 
-        try {
-            $sale = Sale::findOrFail($id);
-            $sale = $this->service->update($sale, $request->validated());
+        $sale = Sale::findOrFail($id);
+        $sale = $this->service->update($sale, $request->validated());
 
-            return $this->successResponse(
-                new SaleResource($sale),
-                "Venda atualizada com sucesso!",
-                200
-            );
-        } catch (\Exception $e) {
-            return $this->errorResponse(
-                $e->getMessage(),
-                [],
-                400
-            );
-        }
+        return $this->successResponse(
+            new SaleResource($sale),
+            "Venda atualizada com sucesso!",
+            200
+        );
     }
 }
