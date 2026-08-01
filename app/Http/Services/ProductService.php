@@ -27,7 +27,7 @@ class ProductService
             $pivotData = [
                 'purchase_value' => $data['purchase_value'],
                 'amount' => $data['amount'],
-                'expiration_date' => $data['expiration_date'] ?? null,
+                'expiration_date' => isset($data['expiration_date']) ? \Carbon\Carbon::parse($data['expiration_date'])->format('Y-m-d') : null,
             ];
             $product->purchases()->attach($purchase->id, $pivotData);
 
@@ -49,7 +49,7 @@ class ProductService
             $pivotData = [
                 'purchase_value' => $data['purchase_value'],
                 'amount' => $data['amount'],
-                'expiration_date' => $data['expiration_date'] ?? null,
+                'expiration_date' => isset($data['expiration_date']) ? \Carbon\Carbon::parse($data['expiration_date'])->format('Y-m-d') : null,
             ];
 
             $product->purchases()->syncWithoutDetaching([$purchase->id => $pivotData]);
