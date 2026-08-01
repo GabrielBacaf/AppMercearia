@@ -26,7 +26,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.2' # Use a versão que você checou antes!
+        php-version: '8.4' # Compatível com as versões recentes travadas no composer.lock
         extensions: mbstring, dom, curl, libxml, mysql
         coverage: none
 
