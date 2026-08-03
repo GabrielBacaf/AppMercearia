@@ -34,7 +34,8 @@ class ProductController extends Controller
     {
         $this->authorize(ProductPermissionEnum::STORE->value);
 
-        $product = $this->productService->storeProduct($request->validated());
+        $data = $request->validated();
+        $product = $this->productService->storeProduct($data);
 
         return $this->successResponse(
             new ProductResource($product),
@@ -58,7 +59,8 @@ class ProductController extends Controller
     {
         $this->authorize(ProductPermissionEnum::UPDATE->value);
 
-        $product = $this->productService->updateProduct($request->validated(), $product);
+        $data = $request->validated();
+        $product = $this->productService->updateProduct($data, $product);
 
         return $this->successResponse(
             new ProductResource($product),
