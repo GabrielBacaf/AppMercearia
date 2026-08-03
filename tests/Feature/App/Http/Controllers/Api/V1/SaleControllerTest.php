@@ -139,8 +139,9 @@ class SaleControllerTest extends TestCase
             ->postJson(route('sales.store'), $payload);
 
         // Assert
-        $response->assertStatus(400); // 400 Bad Request retornado pelo Catch do Controller
-        $response->assertJsonPath('message', "Estoque insuficiente para o produto: {$this->product2->name}");
+        $response->assertStatus(422); // 422 Unprocessable Entity retornado pelo InsufficientStockException
+        $response->assertJsonPath('message', "Um dos itens da venda não possui estoque suficiente.");
+        $response->assertJsonPath('error', "Estoque insuficiente para o produto: {$this->product2->name}");
 
         // Verifica se NENHUMA venda foi criada (Rollback funcionou)
         $this->assertDatabaseCount('sales', 0);

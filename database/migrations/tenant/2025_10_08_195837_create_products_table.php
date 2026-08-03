@@ -22,10 +22,9 @@ return new class extends Migration
             $table->id();
             $table->string('barcode', 14)->unique();
             $table->string('name')->unique();
-            $table->date('expiration_date')->nullable();
             $table->decimal('sale_value', 10, 2);
             $table->foreignId('category_id')->constrained('categories')->restrictOnDelete();
-            $table->integer('stock_quantity');
+            $table->integer('stock_quantity')->default(0);
             $table->timestamps();
         });
     }

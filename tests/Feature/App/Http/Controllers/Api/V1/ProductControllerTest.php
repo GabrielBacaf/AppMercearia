@@ -32,14 +32,7 @@ class ProductControllerTest extends TestCase
             'user_id' => $this->user->id,
         ]);
 
-        $this->productMake =  Product::factory()->make([
-            'purchase_id' => $this->purchase->id,
-            'expiration_date' => '2599-10-09',
-            'amount' => 100,
-            'purchase_value' => 50,
-            'stock_quantity' => '',
-
-        ])->toArray();
+        $this->productMake =  Product::factory()->make()->toArray();
 
         $this->payment = Payment::factory()->create([
             'payable_id' => $this->purchase->id,
@@ -69,7 +62,6 @@ class ProductControllerTest extends TestCase
                 '*' => [
                     'barcode',
                     'name',
-                    'expiration_date',
                     'category_id',
                     'sale_value',
                     'stock_quantity',
@@ -141,7 +133,6 @@ class ProductControllerTest extends TestCase
                 'id',
                 'barcode',
                 'name',
-                'expiration_date',
                 'sale_value',
                 'category_id',
                 'stock_quantity',
@@ -156,9 +147,7 @@ class ProductControllerTest extends TestCase
     public function test_store_deve_retornar_erro_403_se_nao_autorizado(): void
     {
         //Arrange
-        $data = Product::factory()->make([
-            'purchase_id' => $this->purchase->id,
-        ])->toArray();
+        $data = Product::factory()->make()->toArray();
 
         //Act
         $reponse = $this->withHeader('Authorization', "Bearer $this->token")
@@ -177,10 +166,8 @@ class ProductControllerTest extends TestCase
         $invalidData = [
             'name' => '',
             'barcode' => '',
-            'expiration_date' => 'DSDS',
             'category_id' => 9999999, // invalid ID
             'sale_value' => 'DSDS',
-            'stock_quantity' => 'SD',
         ];
 
         //Act
@@ -235,10 +222,8 @@ class ProductControllerTest extends TestCase
     # php artisan test --filter=ProductControllerTest::test_update_deve_atualizar_produto_com_sucesso
     public function test_update_deve_atualizar_produto_com_sucesso(): void
     {
-        //
         $this->user->givePermissionTo(ProductPermissionEnum::UPDATE->value);
-         $this->productMake['expiration_date'] = '2199-10-09 ';
-
+        $this->productMake['name'] = 'Updated Name';
 
         //Act
         $reponse = $this->withHeader('Authorization', "Bearer $this->token")

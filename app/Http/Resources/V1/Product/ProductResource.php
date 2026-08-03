@@ -18,7 +18,6 @@ class ProductResource extends JsonResource
             'id' => $this->id,
             'barcode' => $this->barcode,
             'name' => $this->name,
-            'expiration_date' => $this->expiration_date,
             'sale_value' => $this->sale_value,
             'category_id' => $this->category_id,
             'category' => $this->whenLoaded('category'),

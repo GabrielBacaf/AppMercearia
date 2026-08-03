@@ -2,67 +2,57 @@
 
 namespace App\Http\Services;
 
+use App\Exceptions\Product\ProductNotFoundException;
 use App\Models\Product;
 use App\Models\Purchase;
-use Illuminate\Support\Facades\DB;
+
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Collection;
 
 class ProductService
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function storeProduct(array $data): Product
     {
-        $purchase = Purchase::findOrFail($data['purchase_id']);
-
-        return DB::transaction(function () use ($data, $purchase) {
-
-            $productData = collect($data)->except(['purchase_id', 'purchase_value', 'amount'])->all();
-            $productData['stock_quantity'] = $data['amount'];
-            $product = Product::create($productData);
-
-            $pivotData = [
-                'purchase_value' => $data['purchase_value'],
-                'amount' => $data['amount'],
-                'expiration_date' => isset($data['expiration_date']) ? \Carbon\Carbon::parse($data['expiration_date'])->format('Y-m-d') : null,
-            ];
-            $product->purchases()->attach($purchase->id, $pivotData);
-
-            $purchase->updateStatus();
-
-            return $product;
-        });
+        return Product::create($data);
     }
 
     public function updateProduct(array $data, Product $product): Product
     {
+        $product->update($data);
+        return $product;
+    }
 
-        $purchase = Purchase::findOrFail($data['purchase_id']);
 
-        return DB::transaction(function () use ($data, $product, $purchase) {
+    public function deductStock(array $products): Collection
+    {
+        $productIds = array_column($products, 'id');
 
-            $productData = collect($data)->except(['purchase_id', 'purchase_value', 'amount'])->all();
+        $lockedProducts = Product::lockedByIds($productIds)->get()->keyBy('id');
 
-            $pivotData = [
-                'purchase_value' => $data['purchase_value'],
-                'amount' => $data['amount'],
-                'expiration_date' => isset($data['expiration_date']) ? \Carbon\Carbon::parse($data['expiration_date'])->format('Y-m-d') : null,
-            ];
 
-            $product->purchases()->syncWithoutDetaching([$purchase->id => $pivotData]);
-
-            $product->fill($productData);
-
-            $product->stock_quantity = $product->purchases()->sum('amount');
-
-            $product->save();
-
-            $purchase->updateStatus();
-
-            return $product;
+        return collect($products)->map(function (array $productData) use ($lockedProducts) {
+            return $this->processSingleProductDeduction($productData, $lockedProducts);
         });
+    }
+
+
+    private function processSingleProductDeduction(array $productData, Collection $lockedProducts): Product
+    {
+        $productId = $productData['id'] ?? null;
+
+        $product = $lockedProducts->get($productId);
+
+        throw_unless(
+            $product,
+            ProductNotFoundException::class,
+            (int) $productId
+        );
+
+        $product->deductStock($productData['quantity'] ?? 0);
+
+        return $product;
     }
 }

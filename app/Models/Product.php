@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Exceptions\Product\InsufficientStockException;
 
 class Product extends Model
 {
@@ -15,25 +16,16 @@ class Product extends Model
     protected $fillable = [
         'barcode',
         'name',
-        'expiration_date',
         'sale_value',
         'category_id',
         'stock_quantity',
-        'purchase_id',
-        'purchase_value',
-        'amount',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'expiration_date' => ConvertDateToBrCast::class,
-        ];
-    }
-
+    
     public function purchases(): BelongsToMany
     {
         return $this->belongsToMany(Purchase::class)
+            ->using(PurchaseProduct::class)
             ->withPivot('amount', 'purchase_value', 'expiration_date')
             ->withTimestamps();
     }
@@ -43,39 +35,41 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public static function updateStock(array $products)
+   
+    public function scopeLockedByIds($query, array $ids)
     {
+        return $query->whereIn('id', $ids)->lockForUpdate();
+    }
 
-        $productIds = array_column($products, 'id');
+   
+    public function deductStock(int $quantity): void
+    {
+        throw_unless(
+            $quantity > 0,
+            \InvalidArgumentException::class,
+            "A quantidade a ser deduzida deve ser maior que zero."
+        );
 
-        $lockedProducts = self::whereIn('id', $productIds)
-            ->lockForUpdate()
-            ->get()
-            ->keyBy('id');
+        throw_unless(
+            $this->stock_quantity >= $quantity,
+            InsufficientStockException::class,
+            $this, 
+            $quantity
+        );
 
-        $updatedProducts = collect();
+        $this->stock_quantity -= $quantity;
+        $this->save();
+    }
 
-        foreach ($products as $productData) {
-            $id = $productData['id'];
-            $quantityToDeduct = $productData['quantity'] ?? 0;
+    public function addStock(int $quantity): void
+    {
+        throw_unless(
+            $quantity > 0,
+            \InvalidArgumentException::class,
+            "A quantidade a ser adicionada deve ser maior que zero."
+        );
 
-
-            $product = $lockedProducts->get($id);
-
-            if (!$product) {
-                throw new \DomainException("Produto ID {$id} não encontrado no sistema.");
-            }
-
-            if ($product->stock_quantity < $quantityToDeduct) {
-                throw new \DomainException("Estoque insuficiente para o produto: {$product->name}");
-            }
-
-            $product->stock_quantity -= $quantityToDeduct;
-            $product->save();
-
-            $updatedProducts->push($product);
-        }
-
-        return $updatedProducts;
+        $this->stock_quantity += $quantity;
+        $this->save();
     }
 }

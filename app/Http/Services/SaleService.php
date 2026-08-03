@@ -11,14 +11,15 @@ class SaleService
 {
     public function __construct(
         protected PaymentService $paymentService,
-        protected AccountReceivableService $receivableService
+        protected AccountReceivableService $receivableService,
+        protected ProductService $productService
     ) {}
 
     public function store(array $data)
     {
         return DB::transaction(function () use ($data) {
 
-            $productsInfo = Product::updateStock($data['products'])->keyBy('id');
+            $productsInfo = $this->productService->deductStock($data['products'])->keyBy('id');
 
             $subTotal = 0;
             $pivotData = [];
@@ -46,15 +47,11 @@ class SaleService
 
             $installments = $data['installments'] ?? 1;
             
-            // Generate Accounts Receivable
             $this->receivableService->generateFromSale($sale, $installments);
 
-            // Fetch the first receivable to apply immediate payment if provided
             $firstReceivable = $sale->accountsReceivable()->orderBy('due_date', 'asc')->first();
 
             if ($firstReceivable && !empty($data['payments'])) {
-                // Here we assume the provided payment is for the first installment.
-                // In a real scenario, we might iterate over payments.
                 foreach ($data['payments'] as $paymentData) {
                     $this->receivableService->settle($firstReceivable, $paymentData);
                 }

@@ -22,13 +22,8 @@ O front-end deve enviar os dados no seguinte formato JSON (conforme `StoreProduc
 {
   "barcode": "12345678901234",    // Obrigatório, String, max 14 (Único)
   "name": "Nome do Produto",      // Obrigatório, String, max 255 (Único)
-  "expiration_date": "2027-12-31",// Opcional, Data (AAAA-MM-DD), maior ou igual hoje
   "sale_value": 150.50,           // Obrigatório, Numérico, min 0
-  "category": "nome_categoria",   // Obrigatório, Enum (CategoryEnum)
-  "amount": 10,                   // Obrigatório, Inteiro, min 0
-  "purchase_id": 1,               // Obrigatório, Inteiro, existente na tabela purchases
-  "purchase_value": 100.00        // Obrigatório, Numérico
-  // "stock_quantity": Proibido ser enviado via request.
+  "category": "nome_categoria"    // Obrigatório, Enum (CategoryEnum)
 }
 ```
 
@@ -40,7 +35,6 @@ A API retornará os dados formatados usando o `ProductResource`:
     "id": 1,
     "barcode": "12345678901234",
     "name": "Nome do Produto",
-    "expiration_date": "2027-12-31",
     "sale_value": 150.50,
     "category": "nome_categoria",
     "stock_quantity": 10
